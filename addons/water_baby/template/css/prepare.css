@@ -1,0 +1,7 @@
+#main{background:#fff2d5;}
+.choose{width:100%; height:200px; padding-top:160px;}
+.circle{border-radius:999px; -webkit-border-radius:999px; -moz-border-radius:999px; max-width:150px;}
+.active{border:10px solid rgba(255,255,255,0.8); box-shadow:0 0 20px #fff;}
+.boy{font-size:20px; color:#61bae2;}
+.girl{font-size:20px; color:#f59ea6;}
+.info{position:fixed; bottom:50px; z-index:999; width:100%; text-align:center; color:#f59ea6;}

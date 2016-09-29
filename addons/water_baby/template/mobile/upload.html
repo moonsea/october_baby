@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>孕检结果上传</title>
+<link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/upload.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+<style>
+#weui_media_hd{ width:100px; height:100px; line-height:100px;}
+#weui_media_bd{ max-height:100px; overflow:hidden;}
+</style>
+<script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
+	<div class="top">
+		<a href="{php echo $this->createMobileUrl('my')}" class="weui_media_appmsg">
+	    	<div class="logo">
+	        	<img src="{if empty($mem_info['avatar'])}../addons/water_baby/template/img/icons/user_placehold.png{else}{if substr($mem_info['avatar'],0,4) != 'http'}../attachment/{/if}{$mem_info['avatar']}{/if}"/>
+	        </div>
+	        <div class="user_name">
+	        	{$mem_info['nickname']}
+	        </div>
+		</a>
+    </div>
+    <a href="{php echo $this->createMobileUrl('doupload')}" class="weui_media_box weui_media_appmsg">
+        <div class="weui_media_hd"></div>
+        <div class="weui_media_hd" id="weui_media_hd">
+            <img class="weui_media_appmsg_thumb" src="../addons/water_baby/template/img/photo.jpg" alt="">
+        </div>
+        <div class="weui_media_bd"></div>
+    </a>
+	{loop $moment_list $item}
+    <a href="{php echo $this->createMobileUrl('ShowMomDetail',array('moment_id' => $item['id']));}" class="weui_media_box weui_media_appmsg">
+        <div class="weui_media_hd" style="line-height:1em;">
+            <span class="day" style="display:inline; font-size:20px; font-weight:bold;">{$item['day']}</span>
+            <span class="month" style="display:inline; font-size:14px;">{$item['month']}月</span>
+        </div>
+        <div class="weui_media_hd" id="weui_media_hd">
+            <img class="weui_media_appmsg_thumb" src="../attachment/{$item['pic_list'][0]['pic_url']}" alt="">
+        </div>
+        <div class="weui_media_bd" id="weui_media_bd">
+            	{$item['content']}
+        </div>
+    </a>
+	{/loop}
+
+	<script type="text/javascript">
+		/* 选择图片上传 */
+		function chooseImage() {
+			$('#file').click();
+		}
+	</script>
+</body>
+</html>

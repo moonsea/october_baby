@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>选择孕妇身份时的具体状况</title>
+<link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/prepare.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="{$_W['siteroot']}app/resource/js/app/util.js"></script>
+</head>
+
+
+<body>
+	<div class="tabbar">
+        <div class="weui_tab" id="main">
+            <div class="choose" style="padding-top:50px;">
+            	<table width="100%" align="center" border="0">
+                	<tr>
+                    	<td colspan="2" height="180" align="center" valign="middle">
+                        	<img src="../addons/water_baby/template/img/prepare-pregnant.jpg" class="circle {if $user['preg_type'] == '0'}active{/if}" onClick="select(0)" id="icon1"/>
+                        </td>
+                    </tr>
+                    <tr>
+                    	<td height="30" align="center" valign="middle" class="girl" colspan="2">
+                        	备孕
+                        </td>
+                    </tr>
+                	<tr>
+                    	<td width="50%" height="180" align="center" valign="middle">
+                        	<img src="../addons/water_baby/template/img/ing-pregnant.jpg" class="circle {if $user['preg_type'] == '1'}active{/if}" onClick="select(1)" id="icon2"/>
+                        </td>
+                        <td width="50%" height="180" align="center" valign="middle">
+                        	<img src="../addons/water_baby/template/img/mother-pregnant.jpg" class="circle {if $user['preg_type'] == '2'}active{/if}" onClick="select(2)" id="icon3"/>
+                        </td>
+                    </tr>
+                    <tr>
+                    	<td height="30" align="center" valign="middle" class="girl">
+                        	孕妇
+                        </td>
+                        <td height="30" align="center" valign="middle" class="girl">
+                        	辣妈
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+	<div class="info">
+    	请根据目前状况选择身份
+    </div>
+</body>
+<script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
+<script>
+	function select(type)
+	{
+		$("#icon1").removeClass("active");
+		$("#icon2").removeClass("active");
+		$("#icon3").removeClass("active");
+		if(type == 0)
+		{
+			$("#icon1").addClass("active");
+		}
+		if(type == 1)
+		{
+			$("#icon2").addClass("active");
+		}
+		if(type == 2)
+		{
+			$("#icon3").addClass("active");
+		}
+
+		var href = "{php echo $this->createMobileUrl('PregTypeUpdate');}";
+		$.post(href, {'preg_type' : type, 'old_preg_type' : {$user['preg_type']}}, function(data) {
+			data = $.parseJSON(data);
+
+			if (data.type == 'success') {
+				location.href = data.redirect;
+			} else {
+				util.toast(data.message);
+			}
+		})
+
+	}
+</script>
+
+</html>

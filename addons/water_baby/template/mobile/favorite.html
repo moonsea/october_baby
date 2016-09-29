@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>我的收藏</title>
+<link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/index.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    {loop $article_list $item}
+    <a href="{php echo $this->createMobileUrl('article',array('id'=>$item['article_id']));}" class="weui_media_box weui_media_appmsg">
+        <div class="weui_media_hd">
+            <img class="weui_media_appmsg_thumb" src="{$_W['attachurl']}{$item['article']['img']}" alt="">
+        </div>
+        <div class="weui_media_bd">
+            <h4 class="weui_media_title">{$item['article']['title']}</h4>
+            <p class="weui_media_desc" style="margin-top:8px;">
+                <img src="../addons/water_baby/template/img/icons/favorite.png" width="20" height="20"/>
+                <span>{$item['fav_count']}</span>
+                <time class="fr">{php echo date('Y-m-s',$item['fav_time'])}</time>
+            </p>
+        </div>
+    </a>
+    {/loop}
+</body>
+</html>

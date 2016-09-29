@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>十月宝宝</title>
+    <link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+    <link href="../addons/water_baby/template/css/upload.css" rel="stylesheet" type="text/css">
+    <link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+    <style>
+        #weui_media_hd {
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+        }
+
+        #weui_media_bd {
+            max-height: 100px;
+            overflow: hidden;
+        }
+
+        a {
+            background: #fff;
+            display: block;
+            width: 100%;
+            height: auto;
+            overflow: auto;
+        }
+
+        a {
+            color: #000;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tabbar">
+        <div class="weui_tab">
+            <div class="weui_tab_bd">
+                {if $mem_doctor}
+                <a href="{php echo $this->createMobileUrl('buildRelation',array('doctor_id' => $mem_doctor['uid']));}" class="mb-10">
+                    <div class="weui_media_box weui_media_appmsg">
+                        <table width="100%" border="0">
+                            <tr>
+                                <td width="25%" align="center" valign="middle">
+                                    <img src="{if substr($mem_doctor['avatar'],0,4) != 'http'}../attachment/{/if}{$mem_doctor['avatar']}" style="width:100%" />
+                                </td>
+                                <td width="75%" align="left" valign="top" style="padding-left:8px;">
+                                    <h3 style="color:#56abe4;">{$mem_doctor['nickname']}</h3>
+                                    <p style="font-size:14px;">{$mem_doctor['bio']}</p>
+                                    <p style="text-align:right;">
+                                        <span style="background:#56abe4; color:#fff; border-radius:5px; padding:3px; padding-left:10px; padding-right:10px;">
+											{$mem_doctor['revenue']}元/次
+										</span>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="weui_media_box weui_media_appmsg">
+                        <div class="weui_media_hd">
+                            <img src="../addons/water_baby/template/img/icons/list/zixun1.png" class="weui_media_appmsg_thumb" />
+                        </div>
+                        <div class="weui_media_bd" id="weui_media_bd">
+                            <h4 class="weui_media_title">线上咨询</h4>
+                            <p class="weui_media_desc">
+                                我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字我是说明文字
+                            </p>
+                        </div>
+                    </div>
+                    <div class="weui_media_box weui_media_appmsg">
+                        <div class="weui_btn weui_btn_warn button" style="width:100%;">建立关系</div>
+                    </div>
+                </a>
+                {/if}
+            </div>
+            <!-- <div class="weui_tabbar">
+                <a href="{php echo $this->createMobileUrl('index');}" class="weui_tabbar_item">
+                    <div class="weui_tabbar_icon">
+                        <img src="../addons/water_baby/template/img/icons/index.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">首页</p>
+                </a>
+                <a href="{php echo $this->createMobileUrl('consult');}" class="weui_tabbar_item weui_bar_item_on">
+                    <div class="weui_tabbar_icon">
+                        <img src="../addons/water_baby/template/img/icons/consultation_active.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">咨询</p>
+                </a>
+                <a href="{php echo $this->createMobileUrl(my);}" class="weui_tabbar_item">
+                    <div class="weui_tabbar_icon">
+                        <img src="../addons/water_baby/template/img/icons/my.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">我的</p>
+                </a>
+            </div> -->
+        </div>
+    </div>
+
+</body>
+
+</html>

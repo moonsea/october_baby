@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://www.we7.cc" versionCode="0.6">
+	<application setting="true">
+		<name><![CDATA[十月宝宝]]></name>
+		<identifie><![CDATA[water_baby]]></identifie>
+		<version><![CDATA[1.0.3]]></version>
+		<type><![CDATA[other]]></type>
+		<ability><![CDATA[十月宝宝]]></ability>
+		<description><![CDATA[十月宝宝]]></description>
+		<author><![CDATA[moonsea]]></author>
+		<url><![CDATA[]]></url>
+	</application>
+	<platform>
+		<subscribes>
+		</subscribes>
+		<handles>
+			<message type="text" />
+		</handles>
+		<rule embed="true" />
+	</platform>
+	<bindings>
+		<cover>
+			<entry title="文章" do="article" />
+			<entry title="聊天" do="chat" />
+			<entry title="咨询" do="consult" />
+			<entry title="解答" do="explain" />
+			<entry title="收藏" do="favorite" />
+			<entry title="首页" do="index" />
+			<entry title="我的" do="my" />
+			<entry title="注册" do="regist" />
+			<entry title="上传" do="upload" />
+        </cover>
+		<menu>
+			<entry title="粉丝管理" do="fans"   state="" direct="false" />
+			<entry title="用户管理" do="mother" state="" direct="false" />
+			<entry title="医生管理" do="doctor" state="" direct="false" />
+			<entry title="医院管理" do="hospital" state="" direct="false" />
+			<entry title="科室管理" do="hospdep" state="" direct="false" />
+			<entry title="职称管理" do="hosptitle" state="" direct="false" />
+			<entry title="文章分类" do="articletype" state="" direct="false" />
+			<entry title="文章管理" do="article" state="" direct="false" />
+			<entry title="关于十月" do="editabout" state="" direct="false" />
+		</menu>
+	</bindings>
+	<install><![CDATA[
+CREATE TABLE IF NOT EXISTS `ims_water_obaby_article` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(10) DEFAULT NULL COMMENT '公众号id',
+  `articletypeid` int(10) unsigned NOT NULL COMMENT '文章类别id',
+  `title` varchar(100) NOT NULL COMMENT '文章标题',
+  `desc` varchar(200) DEFAULT NULL COMMENT '简述',
+  `content` text NOT NULL COMMENT '文章内容',
+  `img` varchar(255) NOT NULL COMMENT '文章缩略图',
+  `author` varchar(50) NOT NULL COMMENT '文章作者',
+  `addtime` datetime NOT NULL COMMENT '创建时间',
+  `scansum` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '点击量',
+  `indexno` int(10) unsigned NOT NULL COMMENT '序号',
+  `status` int(3) DEFAULT NULL,
+  `state` int(3) NOT NULL COMMENT '是否显示',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `ims_water_obaby_articletype` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(10) DEFAULT NULL COMMENT '公众号id',
+  `title` varchar(100) NOT NULL COMMENT '分类标题',
+  `desc` varchar(300) NOT NULL COMMENT '描述',
+  `img` varchar(255) NOT NULL COMMENT '分类缩略图',
+  `indexno` int(5) DEFAULT NULL,
+  `state` tinyint(3) unsigned NOT NULL COMMENT '是否显示',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+	]]></install>
+	<uninstall><![CDATA[
+	]]></uninstall>
+	<upgrade><![CDATA[]]></upgrade>
+</manifest>

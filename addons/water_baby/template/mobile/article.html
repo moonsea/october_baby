@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>{$article['title']}</title>
+<link href="../addons/water_baby/template/css/article.css" rel="stylesheet" type="text/css">
+<script src="../addons/water_baby/template/js/jquery.min.js"></script>
+</head>
+
+<body>
+    <!-- <div class="title" style="font-size:20px; text-align:left;">{$article['title']}</div> -->
+    <!-- <div class="weui_media_bd">
+        <p class="weui_media_desc" style="margin-top:8px;">
+            <img src="../addons/water_baby/template/img/icons/{if $fav_status == '1'}favorite_active.png{else}favorite.png{/if}" width="20" height="20" onclick="fav({$article['id']},{$fav_status})"/>
+            <span>{$fav_count}</span>
+            <time class="fr">{$article['addtime']}</time>
+        </p>
+    </div> -->
+    <div class="content">
+        {$article['content']}
+    </div>
+    <div class="weui_media_bd">
+        <p class="weui_media_desc" style="margin-top:8px;float:right">
+            <!-- 发布时间： <time class="fr">{$article['addtime']}</time>
+            &nbsp;&nbsp;&nbsp;&nbsp; -->
+            <img src="../addons/water_baby/template/img/icons/{if $fav_status == '1'}favorite_active.png{else}favorite.png{/if}" width="20" height="20" onclick="fav({$article['id']},{$fav_status})"/>
+            <!-- <span>{$fav_count}</span> -->
+        </p>
+    </div>
+    <script type="text/javascript">
+      function fav(id, fav_status) {
+        var href = "{php echo $this->createMobileUrl('FavArticle');}";
+        $.post(href, {'article_id' : id, 'fav_status' : fav_status}, function(data) {
+          console.log(data);
+          data = $.parseJSON(data);
+
+          if (data.type == 'success') {
+            location.href = data.redirect;
+            // location.reload();
+          } else {
+            alert(data.message);
+            // util.toast(data.message);
+          }
+        })
+      }
+    </script>
+</body>
+</html>

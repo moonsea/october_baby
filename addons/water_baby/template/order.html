@@ -1,0 +1,220 @@
+{template 'common/header'}
+
+<div class="main">
+	<ul class="nav nav-tabs">
+		<li {if $state == "unpay"}class="active"{/if}><a href="{php echo $this->createWebUrl('order',array('state'=>'unpay'));}">未支付订单</a></li>
+		<li {if $state == "reward"}class="active"{/if}><a href="{php echo $this->createWebUrl('order',array('state'=>'reward'));}">已支付订单</a></li>
+		<li {if $state == "cash"}class="active"{/if}><a href="{php echo $this->createWebUrl('order',array('state'=>'cash'));}">提现列表</a></li>
+		<li {if $state == "bonus"}class="active"{/if}><a href="{php echo $this->createWebUrl('bonus',array('state'=>'bonus'));}">统计信息</a></li>
+	</ul>
+{if $state == "bonus"}
+		<div class="panel panel-default">
+		<div class="panel-heading">粉丝统计信息，单位：元</div>
+ 		<div class="panel-body">
+            <div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">粉丝打赏累计</label>
+                   <div class="col-sm-9 col-xs-12">
+                       <input type="text" readonly="readonly" value="{$rewardsum}" class="form-control">
+                       <span class="help-block">粉丝支付打赏的总金额</span>
+                   </div>
+             </div>
+            <div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">粉丝提现累计</label>
+                   <div class="col-sm-9 col-xs-12">
+                       <input type="text" readonly="readonly" value="{$cashsum}" class="form-control">
+                       <span class="help-block">粉丝提现的总金额</span>
+                   </div>
+             </div>                                       
+    	</div>
+    	</div>
+		<div class="panel panel-default">
+		<div class="panel-heading">站长统计信息，单位：元</div>
+ 		<div class="panel-body">
+            <div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">站长抽成总额</label>
+                   <div class="col-sm-9 col-xs-12">
+                       <input type="text" readonly="readonly" value="{$adminsum}" class="form-control">
+                       <span class="help-block">站长抽成=打赏总额*站长抽成比例({$system['adminper']}%)</span>
+                   </div>
+             </div>
+            <div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">站长累计提现总额</label>
+                   <div class="col-sm-9 col-xs-12">
+                       <input type="text" readonly="readonly" value="{$admincashsum}" class="form-control">
+                       <span class="help-block">站长累计提现总额</span>
+                   </div>
+             </div>
+            <div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">站长可提现余额</label>
+                   <div class="col-sm-9 col-xs-12">
+                       <input type="text" readonly="readonly" value="{$adminleft}" class="form-control">
+                       <span class="help-block">可提现余额=抽成总额-已提现总额</span>
+                   </div>
+             </div> 
+             <div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">站长提现</label>
+                   <div class="col-sm-9 col-xs-12">
+                   {if $adminleft<1}
+                     <a class="btn btn-warning btn-sm" href="javascript:void(0);" 
+							title="提现"><i class="icon-edit"></i>满1元才可提现</a>
+                   {else}
+                       <a class="btn btn-success btn-sm" href="javascript:void(0);"  onclick="tixian(0);"
+							title="提现"><i class="icon-edit"></i>申请提现</a>
+                   {/if}
+                   </div>
+                   <input type="hidden" id="txing" value="1">
+             </div>                                                                
+    	</div>
+    	</div>
+		<div class="panel panel-default">
+		<div class="panel-heading">公众号运营商统计信息，单位：元</div>
+ 		<div class="panel-body">
+            <div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">运营商抽成总额</label>
+                   <div class="col-sm-9 col-xs-12">
+                       <input type="text" readonly="readonly" value="{$selfsum}" class="form-control">
+                       <span class="help-block">运营商抽成=打赏总额*运营商抽成比例({$system['rewardper']}%)</span>
+                   </div>
+             </div>                                                   
+    	</div>
+    	</div>    	
+{else}
+<div class="panel panel-info">
+		<div class="panel-heading">累计总量：{$total}笔，金额累计：{$sumje}元</div>
+<!-- 		<div class="panel-body">
+        <form action="{php echo $this->createWebUrl('reward',array('state'=>$state))}" method="post" class="form-horizontal" role="form">
+            <div class="form-group">          
+                <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">打赏内容关键字</label>
+                <div class="col-sm-2 col-lg-2">
+                    <input class="form-control" name="keyword" id="" type="text" value="{$keyword}">
+            	</div>
+                <div class=" col-xs-12 col-sm-2 col-lg-2">
+                    <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+                </div>
+            </div>
+        </form>
+    </div> -->
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-body table-responsive">
+		{if $state == 'unpay'}
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+					<tr>
+						<th style="width: 40px;">序号</th>
+						<th style="width: 120px;">订单号</th>
+						<th style="width: 60px;">金额(元)</th>
+						<th style="width: 60px;">昵称</th>
+						<th style="width: 40px;">头像</th>
+						<th style="width: 80px;">时间</th>
+						<th style="width: 100px; text-align: right;">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{loop $list $item}
+					<tr>
+						<td>{$item['id']}</td>
+						<td>{$item['orderno']}</td>
+						<td>{$item['fee']}</td>
+						<td>{$item['nickname']}</td>
+						<td><img src="{$item['headimgurl']}" width="20%;"></td>
+						<td>{$item['addtime']}</td>
+						<td style="text-align: right;">
+							<a class="btn btn-warning btn-sm" href="javascript:void(0);"  onclick="checkpay({$item['id']});"
+							title="提现"><i class="icon-edit"></i>检查支付</a>
+							<a class="btn btn-default btn-sm" href="#"
+							onclick="drop_confirm('确定要删除吗?','{php echo $this->createWebUrl('addorder',array('op'=>'delete','orderid'=>$item['id']))}');"
+							title="删除"><i class="icon-remove"></i>删除</a></td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>		
+		{else}
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+					<tr>
+						<th style="width: 40px;">序号</th>
+						<th style="width: 90px;">金额(元)</th>
+						<th style="width: 80px;">昵称</th>
+						<th style="width: 80px;">头像</th>
+						<th style="width: 100px;">时间</th>
+						<th style="width: 70px; text-align: right;">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{loop $list $item}
+					<tr>
+						<td>{$item['id']}</td>
+						<td>{$item['fee']}</td>
+						<td>{$item['nickname']}</td>
+						<td><img src="{$item['headimgurl']}" width="20%;"></td>
+						<td>{$item['addtime']}</td>
+						<td style="text-align: right;">
+							<a class="btn btn-default btn-sm" href="#"
+							onclick="drop_confirm('删除会影响数据统计，确定要删除吗?','{php echo $this->createWebUrl('addorder',array('op'=>'delete','orderid'=>$item['id']))}');"
+							title="删除"><i class="icon-remove"></i>删除</a></td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+		{/if}
+		</div>
+		{$pager}
+	</div>
+{/if}
+</div>
+
+<script type="text/javascript">
+
+function tixian(id){
+	var tx =  $("#txing").val();
+	if(tx == 0){
+		return false;
+	}
+	$("#txing").val(0);
+    $.ajax({
+   	type:'POST',
+   	url:'{php echo $this->createWebUrl('addfans',array('op'=>'foundertixian'))}',
+   	data:{fansid:id},
+   	success:function(data){
+   		data  = eval("(" + data +")");
+           if(data.state == "0"){
+           	alert(data.msg);
+           }else{
+           	alert(data.msg);
+           }
+           window.location.reload();
+       }    
+   });
+}
+
+function checkpay(id){
+	if(id.length == 0){
+		alert('id为空');
+		return false;
+	}
+    $.ajax({
+   	type:'POST',
+   	url:'{php echo $this->createWebUrl('checkpay',array('op'=>'checkpay'))}',
+   	data:{id:id},
+   	success:function(data){
+   		data  = eval("(" + data +")");
+           if(data.errcode == "0"){
+           	alert(data.msg);
+	        window.location.reload();
+           }else{
+           	alert(data.errmsg);
+           }
+       }    
+   });
+}
+
+
+    function drop_confirm(msg, url){
+        if(confirm(msg)){
+            window.location = url;
+        }
+    }
+</script>
+{template 'common/footer'}

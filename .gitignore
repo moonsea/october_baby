@@ -1,0 +1,15 @@
+# ignore directory
+/api
+/attachment
+/data
+/payment
+/framework
+/web
+/addons/kobe_pay
+
+#ignore file
+.ftpconfig
+.ftpignore
+api.php
+index.php
+install.php

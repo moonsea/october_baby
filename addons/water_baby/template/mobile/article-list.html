@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>
+    {if $articletypeid==0}
+        今日推荐
+    {/if}
+    {if $articletypeid==1}
+        吃啥喝啥
+    {/if}
+    {if $articletypeid==2}
+        宝宝发育
+    {/if}
+    {if $articletypeid==3}
+        孕期课程
+    {/if}
+</title>
+<link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/index.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/swipe.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="tabbar">
+        <div class="weui_tab">
+        	{if $articletypeid==0}
+                <img src="../addons/water_baby/template/img/head/1.jpg" style="width:100%;"/>
+            {/if}
+            {if $articletypeid==1}
+                <img src="../addons/water_baby/template/img/head/2.jpg" style="width:100%;"/>
+            {/if}
+            {if $articletypeid==2}
+                <img src="../addons/water_baby/template/img/head/3.jpg" style="width:100%;"/>
+            {/if}
+            {if $articletypeid==3}
+                <img src="../addons/water_baby/template/img/head/4.jpg" style="width:100%;"/>
+            {/if}
+
+            <div class="weui_panel weui_panel_access" style="margin-top:-8px;">
+
+                <div class="weui_panel_bd">
+                  {loop $list $item}
+                    <a href="{php echo $this->createMobileUrl('article',array('id'=>$item['id']));}" class="weui_media_box weui_media_appmsg">
+                        <div class="weui_media_hd">
+                            <img class="weui_media_appmsg_thumb" src="{$_W['attachurl']}{$item['img']}" alt="">
+                        </div>
+                        <div class="weui_media_bd">
+                            <h4 class="weui_media_title">{$item['title']}</h4>
+                            <p class="weui_media_desc">{$item['desc']}</p>
+                        </div>
+                    </a>
+
+                  {/loop}
+
+                </div>
+            </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

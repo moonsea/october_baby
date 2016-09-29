@@ -1,0 +1,122 @@
+{php define('MUI', true);}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>第一步-选择医院</title>
+<link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/prepare.css" rel="stylesheet" type="text/css">
+<style>
+.bottom{
+	position:fixed; left:5px; bottom:0; right:5px;
+	z-index:999;
+	}
+</style>
+</head>
+<body>
+	<div class="weui_search_bar" id="search_bar">
+        <form class="weui_search_outer">
+            <div class="weui_search_inner">
+                <i class="weui_icon_search"></i>
+                <input type="search" class="weui_search_input" id="search_input" placeholder="搜索" required onFocus="f()" onBlur="b()" onInput="i()">
+                <a href="javascript:" class="weui_icon_clear" id="search_clear" onTouchend="t2()"></a>
+            </div>
+            <label for="search_input" class="weui_search_text" id="search_text">
+                <i class="weui_icon_search"></i>
+                <span>搜索</span>
+            </label>
+        </form>
+        <a href="javascript:" class="weui_search_cancel" id="search_cancel" onTouchend="t1()">取消</a>
+    </div>
+
+	<div class="weui_cells weui_cells_radio" id="hosp_choice">
+		{loop $hosp_list $item}
+		<label class="weui_cell weui_check_label" for="{$item['hosp_id']}">
+			<div class="weui_cell_bd weui_cell_primary">
+				<p>{$item['hosp_name']}</p>
+			</div>
+			<div class="weui_cell_ft">
+				<input type="radio" class="weui_check" name="radio1" id="{$item['hosp_id']}" {if $item['hosp_id'] == $mem['hosp_id']}checked{/if}>
+				<span class="weui_icon_checked"></span>
+			</div>
+		</label>
+		{/loop}
+    </div>
+
+    <div class="bottom">
+    	<input type="button" class="weui_btn weui_btn_warn" value="下一步" onClick="nextstep()"/>
+    </div>
+
+</body>
+<script src="../addons/water_baby/template/js/jquery.min.js"></script>
+<script>
+	var selected_id = {$mem['hosp_id']};
+	$().ready(function(){
+		$("input[name='radio1']").each(function(){
+			$(this).click(function(){
+				selected_id = $(this).attr("id");
+			});
+		});
+	});
+
+	function f()
+	{
+		var $weuiSearchBar = $('#search_bar');
+        $weuiSearchBar.addClass('weui_search_focusing');
+	}
+	function b()
+	{
+		 var $weuiSearchBar = $('#search_bar');
+		$weuiSearchBar.removeClass('weui_search_focusing');
+		if ($("#search_input").val()) {
+			$('#search_text').hide();
+		} else {
+			$('#search_text').show();
+		}
+	}
+	function i()
+	{
+		var $searchShow = $("#search_show");
+		if ($("#search_input").val().length>0) {
+			$searchShow.show();
+		} else {
+			$searchShow.hide();
+		}
+	}
+	function t1()
+	{
+		$("#search_show").hide();
+        $('#search_input').val('');
+	}
+	function t2()
+	{
+		$("#search_show").hide();
+        $('#search_input').val('');
+	}
+
+	function nextstep()
+	{
+		if (selected_id == 0) {
+			alert('请选择一家医院');
+			return;
+		}
+
+		// location.href = "{php echo $this->createMobileUrl('DoctorStep2', array('hosp_id' => selected_id, 'old_hosp_id' => $mem['hosp_id']))}";
+		var href = "{php echo $this->createMobileUrl('DoctorHospUpdate');}";
+		$.post(href, {'hosp_id' : selected_id,'old_hosp_id':{$mem['hosp_id']}}, function(data) {
+			console.log(data);
+			data = $.parseJSON(data);
+
+			if (data.type == 'success') {
+				location.href = data.redirect;
+			} else {
+				alert(data.message);
+				// util.toast(data.message);
+			}
+		})
+	}
+</script>
+
+</html>

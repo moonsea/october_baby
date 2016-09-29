@@ -1,0 +1,366 @@
+{template 'common/header'}
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="javascript:void(0);">系统设置</a></li>
+    </ul>
+</div>
+<div class="clearfix">
+    <form id="theform" class="form form-horizontal" action="" enctype ="multipart/form-data" method="post">
+        <div class="panel panel-default">
+            <div class="panel-heading">基本设置</div>
+            <div class="panel-body">
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">系统名称</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="sysname" value="{$system['sysname']}" class="form-control">
+                        <span class="help-block">系统名称</span>
+                    </div>
+                </div>            
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">系统描述</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="sysdesc" value="{$system['sysdesc']}" class="form-control">
+                        <span class="help-block">系统描述</span>
+                    </div>
+              </div>
+               <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">关注图片</label>
+                    <div class="col-sm-8 col-xs-12">
+                        {php echo tpl_form_field_image('sysimg',$system['sysimg']);}
+                    	<span class="help-block">引导关注的图片，会展示在帖子详情图片最底部，建议高度200px左右</span>
+                    </div>
+                </div>              
+             </div>
+		</div>		
+
+		<div class="panel panel-default">
+            <div class="panel-heading">签到积分</div>
+            <div class="panel-body">
+               <div class="form-group">
+                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">启用签到</label>
+                	<div class="col-sm-9 col-xs-12">
+                    <label class="checkbox">
+					  <input type="checkbox" name="issign" value="1" {if $system['issign'] == 1}checked="checked"{/if}>勾选则表示启用
+					</label>
+					 </div>
+               </div>           
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">签到送积分</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="syssign" value="{$system['syssign']}" class="form-control">
+                        <span class="help-block">签到送积分数量，填正整数</span>
+                    </div>
+              </div>                
+             </div>
+		</div>
+				
+		<div class="panel panel-default">
+            <div class="panel-heading">积分增减</div>
+            <div class="panel-body">          
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">发帖增减积分</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="noteadd" value="{$system['noteadd']}" class="form-control">
+                        <span class="help-block">发帖时积分变动：0表示不增不减，2表示发帖加2分，-2表示发帖减2分</span>
+                    </div>
+              </div>                
+             </div>
+		</div>
+		<div class="panel panel-default">
+            <div class="panel-heading">防灌水设置</div>
+            <div class="panel-body">           
+             <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">时间间隔</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="timespan" value="{$system['timespan']}" class="form-control">
+                        <span class="help-block">发帖子的时间间隔：单位秒，填整数，0表示不限制</span>
+                    </div>
+              </div>                              
+             </div>
+		</div>				
+		<div class="panel panel-default">
+            <div class="panel-heading">广告区域</div>
+            <div class="panel-body">
+               <div class="form-group">
+                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">启用广告</label>
+                	<div class="col-sm-9 col-xs-12">
+                    <label class="checkbox">
+					  <input type="checkbox" name="isad" value="1" {if $system['isad'] == 1}checked="checked"{/if}>勾选则表示启用
+					</label>
+					 </div>
+               </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">左侧标题</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="adlefttitle" value="{$system['adlefttitle']}" class="form-control">
+                        <span class="help-block">左侧广告的标题</span>
+                    </div>
+               </div>                          
+               <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">左侧广告</label>
+                    <div class="col-sm-8 col-xs-12">
+                        {php echo tpl_form_field_image('adleftimg',$system['adleftimg']);}
+                    	<span class="help-block">左侧广告图片，建议尺寸：612*426</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">左侧链接</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="adlefturl" value="{$system['adlefturl']}" class="form-control">
+                        <span class="help-block">右侧图片点击后的链接地址，没有不填</span>
+                    </div>
+               </div>
+               <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">右侧标题</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="adrighttitle" value="{$system['adrighttitle']}" class="form-control">
+                        <span class="help-block">右侧广告的标题</span>
+                    </div>
+               </div> 
+               <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">右侧广告</label>
+                    <div class="col-sm-8 col-xs-12">
+                        {php echo tpl_form_field_image('adrightimg',$system['adrightimg']);}
+                    	<span class="help-block">右侧广告图片，建议尺寸：612*426</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">右侧链接</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="adrighturl" value="{$system['adrighturl']}" class="form-control">
+                        <span class="help-block">右侧图片点击后的链接地址，没有不填</span>
+                    </div>
+              </div>                                
+             </div>
+		</div>		
+		<div class="panel panel-default">
+            <div class="panel-heading">模板消息</div>
+            <div class="panel-body">           
+              <div class="form-group">
+                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">启用模板消息</label>
+                	<div class="col-sm-9 col-xs-12">
+                    <label class="checkbox">
+					  <input type="checkbox" name="noticeopen" value="2" {if $system['noticeopen'] == 2}checked="checked"{/if}>勾选则表示启用
+					</label>
+					 </div>
+               </div> 
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">评论回复</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="notice" value="{$system['notice']}" class="form-control">
+                        <span class="help-block">OPENTM203574543 收到回复通知 IT科技 互联网|电子商务 </span>
+                    </div>
+              </div> 
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">提现成功</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="noticetixian" value="{$system['noticetixian']}" class="form-control">
+                        <span class="help-block">TM00980 提现成功通知 IT科技 互联网|电子商务 </span>
+                    </div>
+              </div>                             
+             </div>
+		</div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">过滤词汇</div>
+            <div class="panel-body">           
+              <div class="form-group">
+                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">过滤敏感词汇</label>
+                	<div class="col-sm-9 col-xs-12">
+                    <label class="checkbox">
+					  <input type="checkbox" name="badword" value="2" {if $system['badword'] == 2}checked="checked"{/if}>勾选则表示启用
+					</label>
+					 </div>
+               </div>
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">提示</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <span class="help-block">已经提供6000多个敏感词汇，具体查看模块目录下badword.src.php，可自行增加删除</span>
+                    </div>
+              </div>                             
+             </div>
+		</div>		
+		<div class="panel panel-default">
+            <div class="panel-heading">打赏功能</div>
+            <div class="panel-body">
+               <div class="form-group">
+                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">启用打赏</label>
+                	<div class="col-sm-9 col-xs-12">
+                    <label class="checkbox">
+					  <input type="checkbox" name="isreward" value="1" {if $system['isreward'] == 1}checked="checked"{/if}>勾选则表示启用
+					</label>
+					 </div>
+               </div>           
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="text-danger">*</span> 金额列表</label>
+					<div class="col-sm-9 col-xs-9 col-md-9">
+						<div class="input-group">
+							<input class="form-control" placeholder="如:100" style="text-align: right;" name="reward0" value="{$system['reward0']}" type="text">
+							<span class="input-group-addon" id="basic-addon2">元 -</span>
+							<input class="form-control" placeholder="如:50"  style="text-align: right;" name="reward1" value="{$system['reward1']}" type="text">
+							<span class="input-group-addon" id="basic-addon2">元 -</span>
+							<input class="form-control" placeholder="如:10"  style="text-align: right;" name="reward2" value="{$system['reward2']}" type="text">
+							<span class="input-group-addon" id="basic-addon2">元 -</span>
+							<input class="form-control" placeholder="如:5"   style="text-align: right;" name="reward3" value="{$system['reward3']}" type="text">
+							<span class="input-group-addon" id="basic-addon2">元 -</span>
+							<input class="form-control" placeholder="如:1"   style="text-align: right;" name="reward4" value="{$system['reward4']}" type="text">
+							<span class="input-group-addon" id="basic-addon2">元</span>
+							<input class="form-control" placeholder="如:0.1" style="text-align: right;" name="reward5" value="{$system['reward5']}" type="text">
+							<span class="input-group-addon" id="basic-addon2">元</span>
+						</div>
+						<span class="help-block">如开启请填满6个金额,依次展示在打赏页面，单位：元。建议最小金额为0.1元</span>
+					</div>
+			   </div>
+             	{if $founder == 1 }
+             	<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">站长微信昵称</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="foundername" value="{$system['foundername']}" class="form-control">
+                        <span class="help-block">微信需要进入该公众号下的聊吧社区完成登陆授权</span>
+                    </div>
+                </div>
+                {if !empty($system['founderimg'])}
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">站长OpenID</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" readonly="readonly" value="{$system['founderopenid']}" class="form-control">
+                        <span class="help-block">或者填写微信的openid</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">站长头像</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <img src="{$system['founderimg']}" width="15%;">
+                        <span class="help-block">确认为自己的微信账号</span>
+                    </div>
+                </div>
+                {/if} 
+             	{/if}		    
+			   <div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">站长抽成%</label>
+                   <div class="col-sm-9 col-xs-12">
+                       <input type="text" name="adminper" {if $founder!=1 }readonly="readonly"{/if} value="{$system['adminper']}" class="form-control">
+                       <span class="help-block">站长抽成比重，0~100,填整数（站长可设置）</span>
+                   </div>
+             	</div> 
+				<div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">公众号抽成%</label>
+                   <div class="col-sm-9 col-xs-12">
+                       <input type="text" name="rewardper" value="{$system['rewardper']}" class="form-control">
+                       <span class="help-block">公众号运营商抽成比重，0~100,填整数</span>
+                   </div>
+             	</div>
+				<div class="form-group">
+                   <label class="col-xs-12 col-sm-3 col-md-2 control-label">粉丝抽成%</label>
+                   <div class="col-sm-9 col-xs-12">
+                       <input type="text" name="fansper" value="{$system['fansper']}" class="form-control">
+                       <span class="help-block">粉丝抽成比重，1~100,填正整数，注意：三部分和为100</span>
+                   </div>
+             	</div>              	
+			    <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-sm-9 col-xs-12">
+                        <div class="alert alert-info">粉丝赏金提现时企业支付需要使用,认证服务号并开通微信支付<br>
+                             <span class="label label-info">提现时错误信息：-1请查看是否上传证书，-2请查看商户平台的余额</span> <br>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务器IP</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="ip" value="{$system['ip']}" class="form-control">
+                        <span class="help-block">需要服务器IP. 程序将自动获取你的服务器IP, 如果获取失败, 请手动指定</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商户支付证书</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input name="apiclient_cert" type="hidden"  class="form-control" value="{$system['apiclient_cert']}"/> 
+                        <input name="apiclient_cert_file" type="file"  class="form-control" value=""/> 
+                        <span class="help-block">从商户平台上下载支付证书, 解压并取得其中的 <mark>apiclient_cert.pem</mark>上传此文件</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">支付证书私钥</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input name="apiclient_key" type="hidden"  class="form-control" value="{$system['apiclient_key']}"/> 
+                        <input name="apiclient_key_file" type="file"   class="form-control" value=""/> 
+                        <span class="help-block">从商户平台上下载支付证书, 解压并取得其中的 <mark>apiclient_key.pem</mark>上传此文件</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">支付根证书</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input name="rootca" type="hidden"  class="form-control" value="{$system['rootca']}"/> 
+                        <input name="rootca_file" type="file"  class="form-control" value=""/> 
+                        <span class="help-block">从商户平台上下载支付证书, 解压并取得其中的 <mark>rootca.pem</mark>上传此文件</span>
+                    </div>
+                </div>              
+             </div>
+		</div>		
+		<div class="panel panel-default">
+            <div class="panel-heading">借权使用</div>
+            <div class="panel-body">           
+              <div class="form-group">
+                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">启用借权</label>
+                	<div class="col-sm-9 col-xs-12">
+                    <label class="checkbox">
+					  <input type="checkbox" name="auth" value="1" {if $system['auth'] == 1}checked="checked"{/if}>勾选则表示启用
+					</label>
+					 </div>
+               </div> 
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">APPID</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="appid" value="{$system['appid']}" class="form-control">
+                        <span class="help-block">高级账号的appid</span>
+                    </div>
+              </div>
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">SECRET</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="secret" value="{$system['secret']}" class="form-control">
+                        <span class="help-block">高级账号的SECRET</span>
+                    </div>
+              </div>
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商户号</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="mchid" value="{$system['mchid']}" class="form-control">
+                        <span class="help-block">微信支付商户号(MchId)</span>
+                    </div>
+              </div>
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">APIKEY</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="apikey" value="{$system['apikey']}" class="form-control">
+                        <span class="help-block">商户支付密钥(API密钥)</span>
+                    </div>
+              </div>
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">ACID</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="acid" value="{$system['acid']}" class="form-control">
+                        <span class="help-block">子公号ID(acid) 数字</span>
+                    </div>
+              </div>
+               <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">注意</label>
+                    <div class="col-sm-9 col-xs-12">
+                       
+                        <span class="help-block">功能选项：设置借用js分享权限(oAuth不需设置)</span>
+                    </div>
+              </div>                                         
+             </div>
+		</div>
+		
+		
+        <div class="form-group">
+	        <div class="col-sm-12">
+	            <input name="submit" type="submit" value="提交" class="btn btn-primary col-lg-1">
+	            <input type="hidden" name="token" value="{$_W['token']}" />
+	        </div>
+    	</div>   
+    </form>
+</div>
+{template 'common/footer'}

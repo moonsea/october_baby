@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>孕检结果上传</title>
+<style>
+body{
+	background: #fff;
+	margin: 0; padding: 0;
+}
+.top{
+	width:100%; height: 200px; background: #e2e2e2; position: relative;
+}
+.img{
+	position:absolute; width: 120px; height: 120px;
+	border-radius: 999px; -webkit-border-radius:999px;
+	background-color: #fff; left:50%; top:50%;
+	margin-left: -60px; margin-top: -60px;
+	background-image: url(../img/add.png);
+	background-position: center center;
+	background-size: 50% 50%;
+	background-repeat: no-repeat;
+}
+textarea{
+	width: 90%; height: auto; min-height: 80px; overflow: auto;
+	padding: 8px; resize: none;
+	margin: 0 auto; display: block;
+	border: 0; outline: none;
+	font-size:16px;
+}
+ul{
+	marigin:0; padding: 0; list-style: none; height: auto; overflow: auto;
+}
+ul li{
+	margin: 5px; padding: 0; float: left;
+}
+ul li img{
+	width:80px; height: 80px;
+}
+ul li:first-child{
+	width:78px; height: 78px;
+	border: 1px dashed #ccc;
+}
+ul li:first-child img{
+	width: 60px; height: 60px;
+	margin-left: 9px; margin-top: 9px;
+}
+#view{
+	width: 100%; height: 100%;
+	position: absolute; left:0; top: 0; right: 0; bottom: 0;
+	z-index: 999; background:#000;
+	text-align: center;
+	display: -webkit-box;
+	-webkit-box-pack:center;
+	-webkit-box-align:center;
+}
+#view img{
+	width: auto; max-width: 100%; height: auto;
+	align-items: center;
+}
+#del{
+	color: #f00; position: absolute; top: 10px; right: 10px;
+}
+#close{
+	color: #fff; background: #eb4f38; width: 90%; height: 40px; line-height: 40px;
+	border-radius: 5px; -webkit-border-radius:5px; left: 5%; bottom: 10px;
+	position: absolute; z-index: 1000;
+}
+#submit{
+	color: #fff; background: #1AAD19; width: 90%; height: 40px; line-height: 40px;
+	border-radius: 5px; -webkit-border-radius:5px; margin: 0 auto; display: block;
+	border: 0; font-size:18px;
+}
+</style>
+</head>
+
+<body>
+	<form id="data" name="f" enctype="multipart/form-data" action="./index.php?i=4&c=entry&do=MultiUpload&m=water_baby&wxref=mp.weixin.qq.com" method="post" onsubmit="return che();">
+		<!-- <input type="file" name="file" id="file" style="display:none;" accept="image/*;capture=camera" onChange="ajaxFileUpload()"/> -->
+		<textarea placeholder="孕检结果出来了，说点什么吧！" name="info" id="message"></textarea>
+		<ul id="photos">
+			<li onclick="chooseImage()" id="choose_image"><img src="../addons/water_baby/template/img/add.png"/></li>
+		</ul>
+		<input type="submit" name="submit" value="提交" id="submit"/>
+		<input type="hidden" name="over" id='over' value="0"/>
+		<input type="hidden" name="media_id" id="media_id" value=""/>
+	</form>
+
+	<div id="temp" style="display:none;">
+		<li><img src="../addons/water_baby/template/img/girl.jpg"/></li>
+	</div>
+	<div id="view">
+		<!-- <div id="del" onclick="d()">删除</div> -->
+		<div id="close" onclick="c()">关闭</div>
+		<img src="../addons/water_baby/template/img/bg.jpg" onclick="c()"/>
+	</div>
+</body>
+<script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
+<script src="../addons/water_baby/template/js/upload.js" type="text/javascript"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
+<script>
+	$().ready(function(e) {
+        $("#view").hide();
+		wx.config({
+		    debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+		    appId: 'wxee3496c4bd4556c0', // 必填，公众号的唯一标识
+		    timestamp: '{$timestamp}', // 必填，生成签名的时间戳
+		    nonceStr: '{$noncestr}', // 必填，生成签名的随机串
+		    signature: '{$signature}',// 必填，签名，见附录1
+		    jsApiList: [
+				'chooseImage',
+				'previewImage',
+				'uploadImage'
+			] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+		});
+    });
+
+	total = 0;
+	uploaded = 0;
+
+	function chooseImage()
+	{
+		wx.chooseImage({
+		    // count: 1, // 默认9
+		    // sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+		    // sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+		    success: function (res) {
+		        var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+				$(localIds).each(function(index,val){
+					$("#temp li img").attr("src",val);
+					$("#temp li img").attr("id",index+"img");
+					$("#temp li img").attr("onclick","viewImage("+index+")");
+					$("#photos").append($("#temp").html());
+					total ++;
+				});
+				upload(total);
+		    }
+		});
+	}
+
+	function upload(total)
+	{
+		if(uploaded < total)
+		{
+			wx.uploadImage({
+				localId: $("#"+uploaded+"img").attr("src"), // 需要上传的图片的本地ID，由chooseImage接口获得
+				isShowProgressTips: 1, // 默认为1，显示进度提示
+				success: function (res) {
+					serverId = res.serverId; // 返回图片的服务器端ID
+					$("#"+uploaded+"img").attr("data-serverId",serverId);
+					uploaded++;
+					upload(total);
+				}
+			});
+		}
+		else {
+			//alert("uploaddown");
+			$("#over").val(1);
+		}
+	}
+
+	function viewImage(index)
+	{
+		var url = $("#"+index+"img").attr("src");
+		$("#view img").attr("src",url);
+		$("#view img").attr("data-id",index+"img");
+		$("#view").show(200);
+	}
+	function c()
+	{
+		$("#view").hide();
+	}
+	function d()
+	{
+		c();
+		if(confirm("确定删除？"))
+		{
+			var id = $("#view img").attr("data-id");
+			$("#"+id).parent().remove();
+		}
+	}
+	function che()
+	{
+		if($("#message").val().length < 6)
+		{
+			alert("至少六个字");
+			return false;
+		}
+		else
+		{
+			if($("#over").val() == 1)
+			{
+				//获取图片数组
+				serverIds = '';
+				$("#photos li").each(function(index){
+					if(index != 0)
+					{
+						// alert(index+":"+$(this).find("img").attr("data-serverId"));
+						serverIds += $(this).find("img").attr("data-serverId")+","
+					}
+				});
+				$("#media_id").val(serverIds);
+				return true;
+			}
+			else {
+				alert("图片上传中");
+				return false;
+			}
+			return false;
+		}
+	}
+
+	function SaveImage(media_id) {
+		var href = "{php echo $this->createMobileUrl('SaveImage');}";
+		$.post(href, {'media_id' : media_id}, function(data) {
+			console.log(data);
+			data = $.parseJSON(data);
+			if (data.type == 'success') {
+				// location.href = data.redirect;
+			} else {
+				util.toast(data.message);
+			}
+		})
+	}
+
+</script>
+
+
+
+
+
+</html>

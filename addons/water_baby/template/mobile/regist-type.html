@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>注册身份选择</title>
+<link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/prepare.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+	<div class="tabbar">
+        <div class="weui_tab" id="main">
+            <div class="choose">
+            	<table width="100%" align="center" border="0">
+                	<tr>
+                    	<td width="50%" height="200" align="center" valign="middle">
+                        	<img src="../addons/water_baby/template/img/doctor.jpg" class="circle" onClick="select(5)" id="boy"/>
+                        </td>
+                        <td width="50%" height="200" align="center" valign="middle">
+                        	<img src="../addons/water_baby/template/img/pregnant.jpg" class="circle" onClick="select(4)" id="girl"/>
+                        </td>
+                    </tr>
+                    <tr>
+                    	<td height="30" align="center" valign="middle" class="boy">
+                        	医生
+                        </td>
+                        <td height="30" align="center" valign="middle" class="girl">
+                        	孕妇
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+	<div class="info">
+    	请选择准确的身份~
+    </div>
+</body>
+<script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
+<script>
+	function select(type)
+	{
+		if(type == 5)
+		{
+			if($("#girl").hasClass("active"))
+			{
+				$("#girl").removeClass("active");
+			}
+			$("#boy").addClass("active");
+			location.href = "{php echo $this->createMobileUrl('DoctorStep1')}";
+			{php $url = 'DoctorStep1';}
+		}
+		if(type == 4)
+		{
+			if($("#boy").hasClass("active"))
+			{
+				$("#boy").removeClass("active");
+			}
+			$("#girl").addClass("active");
+			location.href = "{php echo $this->createMobileUrl('PregType')}";
+		}
+		// var href = "{php echo $this->createMobileUrl('RegTypeUpdate');}";
+		// $.post(href, {'reg_type' : type}, function(data) {
+		// 	data = $.parseJSON(data);
+		//
+		// 	if (data.type == 'success') {
+		// 		location.href = data.redirect;
+		// 	} else {
+		// 		util.toast(data.message);
+		// 	}
+		// })
+	}
+</script>
+
+</html>

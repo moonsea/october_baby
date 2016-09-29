@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>孕妇咨询列表</title>
+<link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/index.css" rel="stylesheet" type="text/css">
+<style>
+#weui_media_bd{-webkit-box-flex: 2;-webkit-flex: 2;-ms-flex: 2;flex: 2;}
+#fr{position:absolute; top:15px; right:15px;}
+#charge{position:absolute; bottom:15px; right:15px;}
+</style>
+<script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
+<script src="https://cdn.wilddog.com/sdk/js/2.0.0/wilddog.js"></script>
+</head>
+
+<body>
+	<div class="tabbar">
+        <div class="weui_tab">
+            <div class="weui_tab_bd">
+				{loop $conv_list $item}
+                <a href="{php echo $this->createMobileUrl('DoctorChat',array('conv_id' => $item['conv_id'],'type' => $type));}" class="weui_media_box weui_media_appmsg">
+                    <div class="weui_media_hd" id="weui_media_hd">
+                        <img class="weui_media_appmsg_thumb" src="{if substr($item['mem_info']['avatar'],0,4) != 'http'}../attachment/{/if}{$item['mem_info']['avatar']}" alt="">
+                    </div>
+                    <div class="weui_media_bd" id={$item['mem_info']['uid']}>
+                        <h4 class="weui_media_title">{$item['mem_info']['nickname']}</h4>
+                        <p class="weui_media_desc">
+                            {$item['mem_info']['bio']}
+                        </p>
+                    </div>
+					{if $type == '0'}
+                    <div class="weui_media_bd">
+                        <p class="weui_media_desc fr" id="charge">咨询费: {$user_info['revenue']}元/次</p>
+                    </div>
+					{/if}
+                </a>
+				{/loop}
+            </div>
+            <div class="weui_tabbar">
+                <a href="{php echo $this->createMobileUrl('index');}" class="weui_tabbar_item">
+                    <div class="weui_tabbar_icon">
+                        <img src="../addons/water_baby/template/img/icons/index.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">首页</p>
+                </a>
+                <a href="{php echo $this->createMobileUrl('consult');}" class="weui_tabbar_item">
+                    <div class="weui_tabbar_icon">
+                        <img src="../addons/water_baby/template/img/icons/consultation_active.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">咨询</p>
+                </a>
+                <a href="{php echo $this->createMobileUrl('my');}" class="weui_tabbar_item  weui_bar_item_on">
+                    <div class="weui_tabbar_icon">
+                        <img src="../addons/water_baby/template/img/icons/my.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">我的</p>
+                </a>
+
+            </div>
+        </div>
+    </div>
+	<script type="text/javascript">
+
+        // 初始化
+        var config = {
+          authDomain: "october-baby.wilddogio.com",
+          syncURL: "https://october-baby.wilddogio.com"
+        };
+        wilddog.initializeApp(config);
+        var ref = wilddog.sync().ref();
+
+        // 每个客户端自定义的 id
+        var clientId = "{$_W['member']['uid']}";
+        // var doctorId = "{$doctor_info['uid']}";
+
+		/* 监听未读消息 */
+		var presenceRef = wilddog.sync().ref("/mem"+clientId);
+		var doctorUnread = 0;
+
+        $().ready(function(e) {
+            onValue();
+        });
+
+
+
+        /**
+         * 监听消息
+         * @return {[type]} [description]
+         */
+        function onValue() {
+            ref.on("child_changed", function(snapshot) {
+				console.log(snapshot.key());/* 会话conv_id */
+                message = snapshot.val();
+                console.log(message);
+                showMsg(message);
+            });
+			presenceRef.on("value", function(snapshot) {
+
+                // console.log("val"+snapshot.val());
+                if(snapshot.val() == null){
+            		doctorUnread = 0;
+            	}
+                else {
+					snapshot.forEach(function(snap){
+						if (snap.key() != 'status') {
+							// var tmp = snap.key();
+							var tmp_user_id = snap.key().substr(3);
+							var tmp_unread = snap.val();
+							console.log("the ",tmp_user_id," is:",tmp_unread);
+						}
+				     });
+                    // doctor = snapshot.val();
+					// console.log(doctor);
+                    // if(snapshot.hasChild("mem"+clientId)){
+                    //     doctorUnread = doctor.mem{$_W['member']['uid']};
+                    // }
+					// else {
+					// 	doctorUnread = 0;
+					// }
+                    // doctorStatus = doctor.status == null? "disconnected":doctorStatus;
+                    // doctorUnread = doctor.{$_W['member']['uid']} == null? 0:doctor.{$_W['member']['uid']};
+                }
+                // console.log("status:"+doctorStatus);
+                // console.log("unread1:"+doctorUnread);
+            });
+        }
+
+        /**
+         * 显示接收到的消息
+         */
+        function showMsg(message, isBefore) {
+            var text = message.text;
+            console.log(text);
+            var from = message.from;
+            // console.log(from);
+            var isBefore = arguments[1] ? arguments[1] : false
+            // console.log(isBefore);
+            if (message.to == clientId) {
+                console.log(clientId);
+                console.log("NEW MESSAGE");
+            }
+        }
+
+		/**
+	     * 设置医生/律师上线事件
+	     */
+	     var connectedRef = wilddog.sync().ref("/.info/connected");
+	    //  var presenceRef = wilddog.sync().ref("/mem"+clientId);
+
+	     connectedRef.on("value", function(snap) {
+	         console.log('connect:'+snap.val());
+	       if (snap.val() === true) {
+	           // 当客户端在线时，写入一个字符串
+	        //    presenceRef.set("chat_list");
+			   presenceRef.update({
+	              "status": "chat_list"
+	            });
+	       }
+	       else {
+	           // 当客户端连接断开时，写入一个字符串
+	        //    presenceRef.set("disconnected");
+			   presenceRef.update({
+	              "status": "disconnected"
+	            });
+	       }
+	     });
+
+	    /**
+	     * 设置医生/律师离线事件
+	     */
+	    // 当客户端连接断开时，写入一个字符串
+	    // presenceRef.onDisconnect().set("disconnected");
+	    presenceRef.onDisconnect().update({
+			"status":"disconnected"
+		});
+
+    </script>
+</body>
+</html>
