@@ -214,10 +214,13 @@ class water_babyModuleSite extends WeModuleSite
         /* 会话列表 */
         $chat_list = pdo_fetchall('SELECT * FROM '.tablename($conv_table)." WHERE conv_id = '{$conv_id}' ORDER BY addtime DESC");
 
-        /* 创建room_id */
-        $room_id = time();
-        $conv_data = array('conv_id' => $conv_id, 'room_id' => $room_id, 'addtime' => time());
-        pdo_insert($conv_table, $conv_data);
+        $room_id = $_GPC['room_id'];
+        if (empty($room_id)) {
+            /* 创建room_id */
+            $room_id = time();
+            $conv_data = array('conv_id' => $conv_id, 'room_id' => $room_id, 'addtime' => time());
+            pdo_insert($conv_table, $conv_data);
+        }
 
         include $this->template('chat');
     }
@@ -255,7 +258,8 @@ class water_babyModuleSite extends WeModuleSite
 
     /**
      * 医生/律师聊天.
-     *
+     * 0:医生
+     * 1:律师
      * @return [type] [description]
      */
     public function doMobileDoctorChat()
@@ -292,11 +296,43 @@ class water_babyModuleSite extends WeModuleSite
         /* 会话列表 */
         $chat_list = pdo_fetchall('SELECT * FROM '.tablename($conv_table)." WHERE conv_id = '{$conv_id}' ORDER BY addtime DESC");
 
-        /* 最新会话信息 */
-        $chat_info = $chat_list[0];
-        $room_id = $chat_info['room_id'];
+        $chat_info = '';
+        $room_id = '';
+        if (empty($_GPC['room_id'])) {
+            /* 最新会话信息 */
+            $chat_info = $chat_list[0];
+            $room_id = $chat_info['room_id'];
+        }
+        else {
+            $room_id = $_GPC['room_id'];
+            $chat_info = pdo_get($table, array('conv_id' => $conv_id, 'room_id' => $room_id));
+        }
+        $replytime = intval($chat_info['replytime']);
 
         include $this->template('doctor_chat');
+    }
+
+    /**
+     * 更新医生回复时间
+     * @return [type] [description]
+     */
+    public function doMobileupdateReplyTime()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+
+        $id = $_GPC['id'];
+        $replytime = time();
+
+        $result = pdo_update('user_doctor_conv', array('replytime' => $replytime), array('id' => $id));
+
+        if (!empty($result)) {
+            message($replytime, '', 'success');
+        } else {
+            message('更新失败');
+        }
     }
 
     /**
@@ -919,6 +955,34 @@ class water_babyModuleSite extends WeModuleSite
     }
 
     /**
+     * 检测会话是否有效
+     * @param  [type] $user_id   [description]
+     * @param  [type] $doctor_id [description]
+     * @return [type]            [description]
+     */
+    public function checkChatExpir($user_id, $doctor_id)
+    {
+        global $_w, $_GPC;
+
+        $chat_info = pdo_get('mc_doctor_user', array('user_id' => $user_id, 'doctor_id' => $doctor_id));
+        $conv_id = $chat_info['conv_id'];
+        $sql = "SELECT * FROM ".tablename('user_doctor_conv')." WHERE conv_id = '$conv_id' ORDER BY addtime DESC limit 1";
+        $chat_info = pdo_fetch($sql);
+        if (!empty($chat_info)) {
+            $expire = $chat_info['expire'];
+            if ($expire == '1') {
+                $replytime = intval($chat_info['replytime']);
+                if ($replytime == 0 || time() - $replytime <= 21600) {
+                    message('存在未结束会话',$this->createMobileUrl('chat', array('type' => '0', 'doctor_id' => $doctor_id, 'room_id' => $chat_info['room_id'])),'success');
+                }
+                else {
+                    pdo_update('user_doctor_conv', array('expire' => '1'), array('id' => $chat_info['id']));
+                }
+            }
+        }
+    }
+
+    /**
      * 微信支付.
      *
      * @return [type] [description]
@@ -931,6 +995,9 @@ class water_babyModuleSite extends WeModuleSite
 
         $uid = $_W['member']['uid'];
         $doctor_id = $_GPC['doctor_id'];
+
+        /* 是否有有效会话 */
+        $this->checkChatExpir($uid, $doctor_id);
 
         //获取用户要充值的金额数
         // $money = pdo_get('mc_doctor_user', array('user_id' => $uid, 'doctor_id' => $doctor_id));
@@ -960,9 +1027,9 @@ class water_babyModuleSite extends WeModuleSite
         $this->pay($params);
     }
 
-/**
- * 支付结果.
- */
+    /**
+     * 支付结果.
+     */
     //该代码片断在/framework/builtin/recharge/site.php中
     public function payResult($params)
     {
@@ -1377,7 +1444,24 @@ class water_babyModuleSite extends WeModuleSite
 
         $access_token = $this->getToken();
 
-        $url = $this->createMobileUrl('doctor_chat');
+        $type = $_GPC['type'];
+        $room_id = $_GPC['room_id'];
+        $msgtype = $_GPC['msgtype'];
+        $doctor_id = $_GPC['doctor_id'];
+
+        $url = 'http://shiyue.october-baby.com/baby/app/';
+        /**
+         * 0:医生/律师 -> 孕妇
+         * 1:孕妇 -> 医生/律师
+         * @var [type]
+         */
+        if ($msgtype == '0') {
+            $url .= $this->createMobileUrl('chat', array('room_id' => $room_id, 'type' => $type, 'doctor_id' => $doctor_id));
+        }
+        else {
+            $conv_id = $_GPC['conv_id'];
+            $url .= $this->createMobileUrl('doctorchat', array('conv_id' => $conv_id, 'room_id' => $room_id, 'type' => $type));
+        }
 
         /* 构造发送数据 */
         $data = array();
@@ -1386,7 +1470,7 @@ class water_babyModuleSite extends WeModuleSite
 
         $data['touser'] = $openid;
         $data['template_id'] = 'RY9eO78CBFeyyt1-YFUTLuzjVDu6zroTeQeW-0NzulA';
-        $data['url'] = 'http://weixin.qq.com/download';
+        $data['url'] = $url;
 
         $msg = array();
 
@@ -1529,7 +1613,9 @@ class water_babyModuleSite extends WeModuleSite
         load()->func('tpl');
         $articleid = intval($_GPC['articleid']);
         $articletypeid = intval($_GPC['articletypeid']);
-        $articletypesql = 'SELECT * FROM '.tablename($this->articletypetable)." WHERE uniacid = '{$_W['uniacid']}' and state = 2  ORDER BY indexno ";
+        // $articletypeid = intval($_GPC['state']);
+        // $articletypesql = 'SELECT * FROM '.tablename($this->articletypetable)." WHERE uniacid = '{$_W['uniacid']}' and state = '$state'  ORDER BY indexno ";
+        $articletypesql = 'SELECT * FROM '.tablename($this->articletypetable)." WHERE uniacid = '{$_W['uniacid']}' ORDER BY indexno ";
         $articletypelist = pdo_fetchall($articletypesql);
         if ($articleid > 0) {
             $article = pdo_fetch('SELECT * FROM '.tablename($this->articletable)." WHERE id= '{$articleid}'");
