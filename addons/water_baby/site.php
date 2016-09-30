@@ -336,6 +336,33 @@ class water_babyModuleSite extends WeModuleSite
     }
 
     /**
+     * 医生结束会话
+     * @return [type] [description]
+     */
+    public function doMobileEndChat()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $user_id = $_GPC['user_id'];
+        $uid = $_W['member']['uid'];
+
+        $conv_info = pdo_get('mc_doctor_user', array('user_id' => $user_id, 'doctor_id' => $doctor_id));
+        $conv_id = $conv_info['conv_id'];
+
+        $chat_info = pdo_fetch("SELECT * FROM ".tablename('user_doctor_conv'." WHERE conv_id = '$conv_id' ORDER BY addtime DESC LIMIT 1"));
+
+        $result = pdo_query("UPDATE ".tablename('user_doctor_conv')." SET expire = '1' WHERE id = :id", array(':id' => $chat_info['id']));
+
+        if (!empty($result)) {
+            message("更新成功", '', 'success');
+        } else {
+            message('更新失败');
+        }
+    }
+
+    /**
      * 咨询.
      *
      * @return [type] [description]

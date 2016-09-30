@@ -178,5 +178,21 @@
 		});
 
     </script>
+	<script type="text/javascript">
+		function endChat() {
+			var href = "{php echo $this->createMobileUrl('endChat');}";
+			$.post(href, {
+				user_id: '{$chat_info['id']}',
+			}, function(data) {
+				data = $.parseJSON(data);
+
+				if (data.type == 'success') {
+					replytime = data.message;
+				} else {
+					alert(data.message);
+				}
+			});
+		}
+	</script>
 </body>
 </html>
