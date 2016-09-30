@@ -4,7 +4,7 @@
 		<li><a href="{php echo $this->createWebUrl('article',array('articletype'=>$articletypeid));}">文章列表</a></li>
         <li class="active"><a href="javascript:void(0);">编辑文章</a></li>
     </ul>
-</div>       
+</div>
 <style>
 .table td span{display:inline-block;margin-top:4px;}
 .table td input{margin-bottom:0;}
@@ -32,35 +32,35 @@
                         <input type="text" class="form-control"  placeholder="例如：1" name="indexno"  value="{$article['indexno']}">
                     	<span class="help-block">填正整数，数字越小排序越靠前</span>
                     </div>
-                </div>                
+                </div>
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">文章标题</label>
                     <div class="col-sm-8 col-xs-12">
                         <input type="text" class="form-control"  placeholder="" name="title"  value="{$article['title']}">
                     	<span class="help-block">文章名称</span>
                     </div>
-                </div>  
+                </div>
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">文章描述</label>
                     <div class="col-sm-8 col-xs-12">
                         <input type="text" class="form-control"  placeholder="" name="desc"  value="{$article['desc']}">
                     	<span class="help-block">文章描述</span>
                     </div>
-                </div>                                                 
+                </div>
 				<div class="form-group">
 					<label class="col-xs-12 col-sm-3 col-md-2 control-label">文章内容</label>
 					<div class="col-sm-9 col-xs-12">
 						{php echo tpl_ueditor('content', $article['content']);}
 						<span class="help-block">文章内容</span>
 					</div>
-				</div>  
+				</div>
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">文章图片</label>
                     <div class="col-sm-8 col-xs-12">
                         {php echo tpl_form_field_image('img',$article['img']);}
                     	<span class="help-block">文章图片</span>
                     </div>
-                </div>			
+                </div>
 	                <div class="form-group">
                 	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">是否推荐</label>
                 	<div class="col-sm-8 col-xs-12">
@@ -68,15 +68,16 @@
 					  <input type="checkbox" name="status" value="2" {if $article['status'] == 2}checked="checked"{/if}>勾选则表示推荐，展示在推荐位
 					</label>
 					 </div>
-                </div> 			                                                                        
+                </div>
                 <div class="form-group">
-                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">是否展示</label>
+                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">文章类别</label>
                 	<div class="col-sm-8 col-xs-12">
                     <label class="checkbox">
-					  <input type="checkbox" name="state" value="2" {if $article['state'] == 2}checked="checked"{/if}>勾选则表示展示，展示在前端
+					  <input type="radio" name="state" value="1" {if $article['state'] == 1}checked="checked"{/if}>医生
+					  <input type="radio" name="state" value="2" {if $article['state'] == 2}checked="checked"{/if}>孕妇
 					</label>
 					 </div>
-                </div> 
+                </div>
 <!--                 <div class="form-group">
                 	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">文章置顶</label>
                 	<div class="col-sm-8 col-xs-12">
@@ -84,7 +85,7 @@
 					  <input type="checkbox" name="settop" value="2" {if $article['settop'] == 2}checked="checked"{/if}>勾选则表示置顶，最新置顶的文章优先展示
 					</label>
 					 </div>
-                </div>  -->                 
+                </div>  -->
 
         </div>
     </div>

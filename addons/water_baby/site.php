@@ -47,12 +47,16 @@ class water_babyModuleSite extends WeModuleSite
     {
         global $_W,$_GPC;
 
+        $groupid = $_W['member']['groupid'];
+
+        $state = $groupid == '5'? '1':'2';
+
         /* 今日推荐文章列表 limit 4 */
         $tjsql = 'SELECT * FROM '.tablename($this->articletable)."
-		WHERE uniacid = '{$_W['uniacid']}' and status = 2 ORDER BY indexno LIMIT 4";
+		WHERE uniacid = '{$_W['uniacid']}' and status = 2 and state = '$state' ORDER BY indexno LIMIT 4";
         $tjlist = pdo_fetchall($tjsql);
 
-        $articletypesql = 'SELECT * FROM '.tablename($this->articletypetable)." WHERE uniacid = '{$_W['uniacid']}' and state = 2  ORDER BY indexno ";
+        $articletypesql = 'SELECT * FROM '.tablename($this->articletypetable)." WHERE uniacid = '{$_W['uniacid']}' and state = '$state'  ORDER BY indexno ";
         $articletypelist = pdo_fetchall($articletypesql);
 
         include $this->template('index');
@@ -1813,8 +1817,13 @@ class water_babyModuleSite extends WeModuleSite
     public function getArticleListByTid($typeid, $limit)
     {
         global $_W;
+
+        $groupid = $_W['member']['groupid'];
+
+        $state = $groupid == '5'? '1':'2';
+
         $sql = 'SELECT * FROM '.tablename($this->articletable)."
-					WHERE uniacid = '{$_W['uniacid']}' and articletypeid = '{$typeid}' and state = 2 ORDER BY indexno LIMIT ".$limit;
+					WHERE uniacid = '{$_W['uniacid']}' and articletypeid = '{$typeid}' and state = '$state' ORDER BY indexno LIMIT ".$limit;
         $list = pdo_fetchall($sql);
 
         return $list;

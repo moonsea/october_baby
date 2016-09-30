@@ -4,7 +4,7 @@
         <li><a href="{php echo $this->createWebUrl('articletype');}">分类列表</a></li>
         <li class="active"><a href="{php echo $this->createWebUrl('addarticletype');}">新增分类</a></li>
     </ul>
-</div>       
+</div>
 <style>
 .table td span{display:inline-block;margin-top:4px;}
 .table td input{margin-bottom:0;}
@@ -21,15 +21,15 @@
                         <input type="text" class="form-control"  readonly="readonly" value="{$articletypeurl}">
                     	<span class="help-block">可复制到微信打开，即当前分类</span>
                     </div>
-                </div>    -->              
-                
+                </div>    -->
+
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">分类排序</label>
                     <div class="col-sm-8 col-xs-12">
                         <input type="text" class="form-control"  placeholder="例如：1" name="indexno"  value="{$articletype['indexno']}">
                     	<span class="help-block">填正整数，数字越小排序越靠前</span>
                     </div>
-                </div>                
+                </div>
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">分类标题</label>
                     <div class="col-sm-8 col-xs-12">
@@ -37,7 +37,7 @@
                     	<span class="help-block">分类名称</span>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">分类描述</label>
                     <div class="col-sm-8 col-xs-12">
@@ -51,15 +51,16 @@
                         {php echo tpl_form_field_image('img',$articletype['img']);}
                     	<span class="help-block">分类图标</span>
                     </div>
-                </div>                                                                            
+                </div>
                 <div class="form-group">
-                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">是否启用</label>
+                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">分类类别</label>
                 	<div class="col-sm-8 col-xs-12">
                     <label class="checkbox">
-					  <input type="checkbox" name="state" value="2" {if $articletype['state'] == 2}checked="checked"{/if}>勾选则表示启用，展示在前端
+                        <input type="radio" name="state" value="1" {if $articletype['state'] == 1}checked="checked"{/if}>医生
+                        <input type="radio" name="state" value="2" {if $articletype['state'] == 2}checked="checked"{/if}>孕妇
 					</label>
 					 </div>
-                </div>  
+                </div>
 
         </div>
     </div>
