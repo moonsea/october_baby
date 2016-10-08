@@ -15,7 +15,12 @@
             <div class="weui_tab_bd">
             	<div class="swipe" id="slider">
                 	<div class='swipe-wrap' id="banner-content">
+                        {loop $banner_list $item}
                         <a href="#">
+                            <img src="../attachment/{$item['img']}"/>
+                        </a>
+                        {/loop}
+                        <!-- <a href="#">
                             <img src="../addons/water_baby/template/img/ads/1.jpg"/>
                         </a>
                         <a href="#">
@@ -26,7 +31,7 @@
                         </a>
                         <a href="#">
                             <img src="../addons/water_baby/template/img/ads/4.jpg"/>
-                        </a>
+                        </a> -->
                     </div>
                     <div id="pointer">
                         <a class="active"></a>

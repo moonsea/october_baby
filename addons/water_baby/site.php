@@ -3,7 +3,7 @@
 session_start();
 /*
  * 十月宝宝
- * @author DONGYUE
+ * @author moonsea
  * 2016年05月12日08:32:25
  * QQ491024175
  * @url http://bbs.we7.cc/
@@ -39,6 +39,11 @@ class water_babyModuleSite extends WeModuleSite
     public $logtable = 'water_obaby_log';
 
     /**
+     * 律师id
+     */
+    public $LawerId = '91';
+
+    /**
      * 首页.
      *
      * @return [type] [description]
@@ -50,6 +55,10 @@ class water_babyModuleSite extends WeModuleSite
         $groupid = $_W['member']['groupid'];
 
         $state = $groupid == '5'? '1':'2';
+
+        /* 首页Banner */
+        $sql = "SELECT * FROM ".tablename('water_baby_banner')." WHERE state = '$state' ORDER BY indexno LIMIT 4";
+        $banner_list = pdo_fetchall($sql);
 
         /* 今日推荐文章列表 limit 4 */
         $tjsql = 'SELECT * FROM '.tablename($this->articletable)."
@@ -161,7 +170,7 @@ class water_babyModuleSite extends WeModuleSite
 
     /**
      * 聊天.
-     *
+     * auth_type: 0: 不校验会话, 1:校验会话
      * @return [type] [description]
      */
     public function doMobileChat()
@@ -169,6 +178,8 @@ class water_babyModuleSite extends WeModuleSite
         global $_W,$_GPC;
 
         checkauth();
+
+        $auth_type = empty($_GPC['auth_type'])? '0':$_GPC['auth_type'];
 
         $user_id = $_W['member']['uid'];
         $doctor_id = empty($_SESSION['doctor_id']) ? $_GPC['doctor_id'] : $_SESSION['doctor_id'];
@@ -220,6 +231,22 @@ class water_babyModuleSite extends WeModuleSite
             $room_id = time();
             $conv_data = array('conv_id' => $conv_id, 'room_id' => $room_id, 'addtime' => time());
             pdo_insert($conv_table, $conv_data);
+        }
+
+        /* 校验会话有效性 */
+        if ($type == '0' && $auth_type == '1') {
+            $info = pdo_get($conv_table, array('conv_id' => $conv_id, 'room_id' => $room_id));
+            $expire = $info['expire'];
+            if ($expire == '1') {
+                $replytime = intval($info['replytime']);
+                if (($replytime != 0) && (time() - $replytime > 21600)) {
+                    pdo_update('user_doctor_conv', array('expire' => '0'), array('id' => $info['id']));
+                    message('当前会话已经结束，请重新咨询！',$this->createMobileUrl('consult'),'success');
+                }
+            }
+            else {
+                message('当前会话已经结束，请重新咨询！',$this->createMobileUrl('consult'),'success');
+            }
         }
 
         include $this->template('chat');
@@ -305,7 +332,7 @@ class water_babyModuleSite extends WeModuleSite
         }
         else {
             $room_id = $_GPC['room_id'];
-            $chat_info = pdo_get($table, array('conv_id' => $conv_id, 'room_id' => $room_id));
+            $chat_info = pdo_get($conv_table, array('conv_id' => $conv_id, 'room_id' => $room_id));
         }
         $replytime = intval($chat_info['replytime']);
 
@@ -394,7 +421,7 @@ class water_babyModuleSite extends WeModuleSite
         $mem_doctor = $this->getMemInfo($consult['doctor_id']);
 
         /* 律师信息 */
-        $lawer_id = '59'; /* 固定 */
+        $lawer_id = $this->LawerId; /* 固定 */
         $lawer_info = $this->getMemInfo($lawer_id);
 
         // $_SESSION['doctor_id'] = $consult['doctor_id']; /* 仅用作测试 */
@@ -850,7 +877,7 @@ class water_babyModuleSite extends WeModuleSite
      *
      * @return [type] [description]
      */
-    public function saveImage($media_id)
+    public function saveImage($media_id, $upload_path = 'upload')
     {
         if ($media_id == '' || empty($media_id)) {
             return null;
@@ -862,7 +889,7 @@ class water_babyModuleSite extends WeModuleSite
         $url .= 'access_token='.$access_token;
         $url .= '&media_id='.$media_id;
 
-        $save_dir = '../attachment/images/upload/';
+        $save_dir = '../attachment/images/'.$upload_path.'/';
         $filename = date('YmdHis', time()).mt_rand().'.jpg';
 
         $res = $this->getFile($url, $save_dir, $filename, 1);
@@ -921,10 +948,11 @@ class water_babyModuleSite extends WeModuleSite
         fclose($fp2);
         unset($content, $url);
 
-        return array(
-            'file_name' => $filename,
-            'save_path' => $save_dir.$filename,
-        );
+        // return array(
+        //     'file_name' => $filename,
+        //     'save_path' => $save_dir.$filename,
+        // );
+        return $save_dir.$filename;
     }
 
     /**
@@ -966,9 +994,9 @@ class water_babyModuleSite extends WeModuleSite
                     if (!empty($media_id)) {
                         $res = $this->saveImage($media_id);
                         if (!is_null($res)) {
-                            $pic_url = $res['save_path'];
+                            // $pic_url = $res['save_path'];
                             // print_r($pic_url);
-                            pdo_insert('mc_mom_pic', array('pic_url' => $pic_url, 'moment_id' => $mom_id));
+                            pdo_insert('mc_mom_pic', array('pic_url' => $res, 'moment_id' => $mom_id));
                         }
                     }
                 }
@@ -1000,10 +1028,10 @@ class water_babyModuleSite extends WeModuleSite
             if ($expire == '1') {
                 $replytime = intval($chat_info['replytime']);
                 if ($replytime == 0 || time() - $replytime <= 21600) {
-                    message('存在未结束会话',$this->createMobileUrl('chat', array('type' => '0', 'doctor_id' => $doctor_id, 'room_id' => $chat_info['room_id'])),'success');
+                    message('上次会话未结束，可继续咨询！',$this->createMobileUrl('chat', array('type' => '0', 'doctor_id' => $doctor_id, 'room_id' => $chat_info['room_id'])),'success');
                 }
                 else {
-                    pdo_update('user_doctor_conv', array('expire' => '1'), array('id' => $chat_info['id']));
+                    pdo_update('user_doctor_conv', array('expire' => '0'), array('id' => $chat_info['id']));
                 }
             }
         }
@@ -1483,7 +1511,7 @@ class water_babyModuleSite extends WeModuleSite
          * @var [type]
          */
         if ($msgtype == '0') {
-            $url .= $this->createMobileUrl('chat', array('room_id' => $room_id, 'type' => $type, 'doctor_id' => $doctor_id));
+            $url .= $this->createMobileUrl('chat', array('room_id' => $room_id, 'type' => $type, 'doctor_id' => $doctor_id, 'auth_type' => '1'));
         }
         else {
             $conv_id = $_GPC['conv_id'];
@@ -1926,6 +1954,71 @@ class water_babyModuleSite extends WeModuleSite
         }
         include $this->template('about');
     }
+
+    /**
+     * 首页Banner管理
+     * @return [type] [description]
+     */
+    public function dowebBanner()
+    {
+        global $_W,$_GPC;
+        $pageNumber = max(1, intval($_GPC['page']));
+        $pageSize = 20;
+        $table = 'water_baby_banner';
+        $sql = 'SELECT * FROM '.tablename($table)." ORDER BY indexno LIMIT ".($pageNumber - 1) * $pageSize.','.$pageSize;
+        $list = pdo_fetchall($sql);
+        $total = pdo_fetchcolumn('SELECT COUNT(*) FROM '.tablename($table));
+        $pager = pagination($total, $pageNumber, $pageSize);
+        include $this->template('banner');
+    }
+
+    /**
+     * 增加/修改/删除Banner.
+     */
+    public function dowebaddBanner()
+    {
+        global $_W,$_GPC;
+        load()->func('tpl');
+        $table = 'water_baby_banner';
+        $img_id = intval($_GPC['img_id']);
+        if ($img_id > 0) {
+            $banner = pdo_fetch('SELECT * FROM '.tablename($table)." WHERE id= '{$img_id}'");
+            if (!$banner) {
+                message('抱歉，信息不存在或是已经删除！', '', 'error');
+            }
+            //$topicurl = $_W['siteroot'].'app/'.$this->createMobileUrl ( 'topic',array('topicid'=>$topicid));
+        }
+
+        if ($_GPC['op'] == 'delete') {
+            $banner = pdo_fetch('SELECT * FROM '.tablename($table)." WHERE id= '{$img_id}'");
+            if (empty($banner['id'])) {
+                message('抱歉，信息不存在或是已经被删除！');
+            }
+            pdo_delete($table, array('id' => $img_id));
+            message('删除成功！', referer(), 'success');
+        }
+
+        if (checksubmit()) {
+            $data = array(
+                    'title' => $_GPC ['title'],
+                    'img' => $_GPC ['img'],
+                    'indexno' => intval($_GPC ['indexno']),
+                    'state' => intval($_GPC ['state']),
+            );
+
+            if (!empty($img_id)) {
+                pdo_update($table, $data, array('id' => $img_id));
+            } else {
+                // $data['uniacid'] = $_W['uniacid'];
+                pdo_insert($table, $data);
+                $img_id = pdo_insertid();
+            }
+            $banner = pdo_fetch('SELECT * FROM '.tablename($table)." WHERE id = '{$img_id}'");
+            message('更新成功！', referer(), 'success');
+        }
+        include $this->template('addbanner');
+    }
+
 
     public function getArticleListByTid($typeid, $limit)
     {

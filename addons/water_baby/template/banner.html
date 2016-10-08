@@ -1,0 +1,54 @@
+{template 'common/header'}
+
+<div class="main">
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="{php echo $this->createWebUrl('articletype');}">Banner列表</a></li>
+		<li><a href="{php echo $this->createWebUrl('addbanner');}">新增Banner</a></li>
+	</ul>
+	<div class="panel panel-info">
+		<div class="panel-heading">当前数量： {$total}</div>
+
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-body table-responsive">
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+					<tr>
+						<th style="width: 40px;">序号</th>
+						<th style="width: 80px;">标题</th>
+						<th style="width: 80px;">类别</th>
+						<th style="width: 80px;">图片</th>
+						<th style="width: 80px; text-align: right;">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{loop $list $item}
+					<tr>
+						<td>{$item['indexno']}</td>
+						<td>{$item['title']}</td>
+						<td>{if $item['state'] == '1'}医生{else}孕妇{/if}</td>
+						<td><img src="../attachment/{$item['img']}" alt="" width="300" /></td>
+						<td style="text-align: right;"><a class="btn btn-success btn-sm"
+							href="{php echo $this->createWebUrl('addbanner', array('img_id'=>$item['id']))}"
+							title="编辑"><i class="icon-edit"></i>编辑</a>
+							<a class="btn btn-default btn-sm" href="#"
+							onclick="drop_confirm('确定要删除吗?','{php echo $this->createWebUrl('addbanner',array('op'=>'delete','img_id'=>$item['id']))}');"
+							title="删除"><i class="icon-remove"></i>删除</a></td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+		</div>
+		{$pager}
+	</div>
+</div>
+
+<script type="text/javascript">
+    function drop_confirm(msg, url){
+        if(confirm(msg)){
+            window.location = url;
+        }
+    }
+</script>
+{template 'common/footer'}

@@ -1,0 +1,66 @@
+{template 'common/header'}
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li><a href="{php echo $this->createWebUrl('banner');}">Banner列表</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('addbanner');}">新增Banner</a></li>
+    </ul>
+</div>
+<style>
+.table td span{display:inline-block;margin-top:4px;}
+.table td input{margin-bottom:0;}
+</style>
+<div class="clearfix">
+<form class="form-horizontal form" action="" method="post" enctype="multipart/form-data">
+    <div class="panel panel-default">
+        <div class="panel-heading">Banner信息编辑</div>
+        <div class="panel-body">
+                <input type="hidden" name="img_id" value="{$banner['id']}">
+<!--                 <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">分类URL</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control"  readonly="readonly" value="{$articletypeurl}">
+                    	<span class="help-block">可复制到微信打开，即当前分类</span>
+                    </div>
+                </div>    -->
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">显示顺序序</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control"  placeholder="例如：1" name="indexno"  value="{$banner['indexno']}">
+                    	<span class="help-block">填正整数，数字越小排序越靠前</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">Banner标题</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control"  placeholder="" name="title"  value="{$banner['title']}">
+                    	<span class="help-block">Banner名称</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">Banner图片</label>
+                    <div class="col-sm-8 col-xs-12">
+                        {php echo tpl_form_field_image('img',$banner['img']);}
+                    	<span class="help-block">图片</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                	<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">类别</label>
+                	<div class="col-sm-8 col-xs-12">
+                    <label class="checkbox">
+                        <input type="radio" name="state" value="1" {if $banner['state'] == 1}checked="checked"{/if}>医生
+                        <input type="radio" name="state" value="2" {if $banner['state'] == 2}checked="checked"{/if}>孕妇
+					</label>
+					 </div>
+                </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-12">
+            <input name="submit" type="submit" value="提交" class="btn btn-primary col-lg-1">
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </div>
+</form>
+</div>
+{template 'common/footer'}

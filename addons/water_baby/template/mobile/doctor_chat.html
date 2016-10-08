@@ -90,12 +90,12 @@
             font-size: 16px;
         }
 
-        .mylist li span.left {
+        .mylist li .left {
             background: #ffffff;
         }
 
-        .mylist li span.right {
-            background: #04BE02;
+        .mylist li .right {
+            background: #a1dc2a;
         }
 
         .mylist li img {
@@ -142,13 +142,13 @@
                     <div class="Input_Foot">
                         <a class="imgBtn" href="javascript:void(0);"></a>
                         <textarea class="Input_text"></textarea>
-                        <a class="postBtn">发送</a>
+                        <div class="postBtn">发送</div>
                     </div>
                 </div>
             </div>
             <div id="temp" style="display:none;">
                 <li>
-                    <img src="{if substr($doctor_info['avatar'],0,4) != 'http'}../attachment/{/if}{$user_info['avatar']}" class="right mr-10" id="title" />
+                    <img src="{if substr($user_info['avatar'],0,4) != 'http'}../attachment/{/if}{$user_info['avatar']}" class="right mr-10" id="title" />
                     <span class="right">我是聊天内容</span>
                 </li>
             </div>
@@ -381,6 +381,8 @@
                 });
                 $(".imgBtn").click(function() {
                     if (isShowImg == false) {
+						$(".Input_Foot").css("border-top","1px solid #ccc");
+						$(".imgBtn").css("background-image","url(../addons/water_baby/template/img/smile-hover.png)");
                         isShowImg = true;
                         $(this).parent().prev().animate({
                             bottom: "45px"
@@ -399,13 +401,14 @@
                         }
                     } else {
                         isShowImg = false;
+						$(".Input_Foot").css("border-top","0");
+						$(".imgBtn").css("background-image","url(../addons/water_baby/template/img/smile.png)");
                         $(this).parent().prev().animate({
                             bottom: "-190px"
                         }, 300);
                     }
                 });
                 $(".postBtn").click(function() {
-                    //alert($(".Input_text").val());
                     //发送文字
                     var text = $(".Input_text").val();
                     $(".Input_text").val("");
