@@ -68,6 +68,33 @@ class water_babyModuleSite extends WeModuleSite
         $articletypesql = 'SELECT * FROM '.tablename($this->articletypetable)." WHERE uniacid = '{$_W['uniacid']}' and state = '$state'  ORDER BY indexno ";
         $articletypelist = pdo_fetchall($articletypesql);
 
+
+        global $_W;
+        load()->classs('weixin.account');
+        $id = $_W['acid'];
+        if (empty($id)) {
+            $id = $_W['uniacid'];
+        }
+        $accObj = WeixinAccount::create($id);
+        $access_token = $accObj->fetch_token();
+        // var_dump($access_token);
+		if($_COOKIE['jsapi_ticket'])
+		{
+			$jsapi_ticket = $_COOKIE['jsapi_ticket'];
+		}
+		else
+		{
+			$tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
+			$jsapi_ticket = $tmp->ticket;
+			setcookie('jsapi_ticket',$jsapi_ticket,7000);
+			$_COOKIE['jsapi_ticket'] == $jsapi_ticket;
+		}
+        $noncestr = 'Wm3WZYTPz0wzccnW';
+        $timestamp = time();
+        $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=index&m=water_baby';
+        $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
+        $signature = sha1($string);
+
         include $this->template('index');
     }
 
@@ -88,8 +115,12 @@ class water_babyModuleSite extends WeModuleSite
         if ($articletypeid > 0) {
             $condition .= " and articletypeid = '{$articletypeid}'";
         }
+
+        $groupid = $_W['member']['groupid'];
+        $state = $groupid == '5'? '1':'2';
+
         $sql = 'SELECT * FROM '.tablename($this->articletable)."
-					WHERE uniacid = '{$_W['uniacid']}' {$condition} ORDER BY indexno LIMIT 100";
+					WHERE state = '$state' and uniacid = '{$_W['uniacid']}' {$condition} ORDER BY indexno LIMIT 100";
         $list = pdo_fetchall($sql);
         include $this->template('article-list');
     }
@@ -229,7 +260,8 @@ class water_babyModuleSite extends WeModuleSite
         if (empty($room_id)) {
             /* 创建room_id */
             $room_id = time();
-            $conv_data = array('conv_id' => $conv_id, 'room_id' => $room_id, 'addtime' => time());
+            $conv_data = array('conv_id' => $conv_id, 'room_id' => $room_id, 'addtime' => time(),'expire' => '1');
+			// $conv_data = array('conv_id' => $conv_id, 'room_id' => $room_id, 'addtime' => time());
             pdo_insert($conv_table, $conv_data);
         }
 
@@ -861,11 +893,20 @@ class water_babyModuleSite extends WeModuleSite
         $accObj = WeixinAccount::create($id);
         $access_token = $accObj->fetch_token();
         // var_dump($access_token);
-        $tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
+		if($_COOKIE['jsapi_ticket'])
+		{
+			$jsapi_ticket = $_COOKIE['jsapi_ticket'];
+		}
+		else
+		{
+			$tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
+			$jsapi_ticket = $tmp->ticket;
+			setcookie('jsapi_ticket',$jsapi_ticket,7000);
+			$_COOKIE['jsapi_ticket'] == $jsapi_ticket;
+		}
         $noncestr = 'Wm3WZYTPz0wzccnW';
-        $jsapi_ticket = $tmp->ticket;
         $timestamp = time();
-        $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=doupload&m=water_baby';
+        $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&eid=6	';
         $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
         $signature = sha1($string);
 
@@ -1027,7 +1068,7 @@ class water_babyModuleSite extends WeModuleSite
             $expire = $chat_info['expire'];
             if ($expire == '1') {
                 $replytime = intval($chat_info['replytime']);
-                if ($replytime == 0 || time() - $replytime <= 21600) {
+                if (($replytime == 0) || (time() - $replytime <= 21600)) {
                     message('上次会话未结束，可继续咨询！',$this->createMobileUrl('chat', array('type' => '0', 'doctor_id' => $doctor_id, 'room_id' => $chat_info['room_id'])),'success');
                 }
                 else {
@@ -1073,7 +1114,8 @@ class water_babyModuleSite extends WeModuleSite
             'ordersn' => $ordersn, //time(),//date('Ymdhis'), //$chargerecord['tid'],  //收银台中显示的订单号
             'tid' => date('Ymdhis'), //$chargerecord['tid'],      //充值模块中的订单号，此号码用于业务模块中区分订单，交易的识别码
             'fee' => $fee,      //收银台中显示需要支付的金额,只能大于 0
-            'user' => $_W['member']['uid'],     //付款用户, 付款的用户名(选填项)
+            // 'user' => $_W['member']['uid'],     //付款用户, 付款的用户名(选填项)
+            'user' => $doctor_id,     //付款用户, 付款的用户名(选填项)
         );
 
         $_SESSION['doctor_id'] = $doctor_id;
@@ -1648,7 +1690,7 @@ class water_babyModuleSite extends WeModuleSite
             $condition .= "and articletypeid ='{$articletypeid}'";
         }
         $sql = 'SELECT * FROM '.tablename($this->articletable)."
-					WHERE uniacid = '{$_W['uniacid']}' {$condition} ORDER BY indexno LIMIT ".($pageNumber - 1) * $pageSize.','.$pageSize;
+					WHERE uniacid = '{$_W['uniacid']}' {$condition} ORDER BY articletypeid,indexno LIMIT ".($pageNumber - 1) * $pageSize.','.$pageSize;
         $list = pdo_fetchall($sql);
         for ($i = 0; $i < count($list); ++$i) {
             $list[$i]['addtime'] = date('Y-m-d', $list[$i]['addtime']);
