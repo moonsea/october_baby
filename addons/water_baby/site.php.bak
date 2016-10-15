@@ -62,33 +62,24 @@ class water_babyModuleSite extends WeModuleSite
 
         /* 今日推荐文章列表 limit 4 */
         $tjsql = 'SELECT * FROM '.tablename($this->articletable)."
-		WHERE uniacid = '{$_W['uniacid']}' and status = 2 and state = '$state' ORDER BY addtime LIMIT 4";
+		WHERE uniacid = '{$_W['uniacid']}' and status = 2 and state = '$state' ORDER BY indexno LIMIT 4";
         $tjlist = pdo_fetchall($tjsql);
 
         $articletypesql = 'SELECT * FROM '.tablename($this->articletypetable)." WHERE uniacid = '{$_W['uniacid']}' and state = '$state'  ORDER BY indexno ";
         $articletypelist = pdo_fetchall($articletypesql);
-
-        // load()->classs('weixin.account');
-        // $id = $_W['acid'];
-        // if (empty($id)) {
-        //     $id = $_W['uniacid'];
-        // }
-        // $accObj = WeixinAccount::create($id);
-        // $access_token = $accObj->fetch_token();
-        $access_token = $this->getToken();
+		
+		
+        load()->classs('weixin.account');
+        $id = $_W['acid'];
+        if (empty($id)) {
+            $id = $_W['uniacid'];
+        }
+        $accObj = WeixinAccount::create($id);
+        $access_token = $accObj->fetch_token();
         // var_dump($access_token);
-		if($_COOKIE['jsapi_ticket'])
-		{
-			$jsapi_ticket = $_COOKIE['jsapi_ticket'];
-		}
-		else
-		{
-			$tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
-			$jsapi_ticket = $tmp->ticket;
-			setcookie('jsapi_ticket',$jsapi_ticket,7000);
-			$_COOKIE['jsapi_ticket'] == $jsapi_ticket;
-		}
-        $noncestr = 'Wm3WZYTPz0wzccnW';
+        $tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
+        $noncestr = 'abcdeddefsfvds';
+        $jsapi_ticket = $tmp->ticket;
         $timestamp = time();
         $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=index&m=water_baby';
         $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
@@ -260,7 +251,6 @@ class water_babyModuleSite extends WeModuleSite
             /* 创建room_id */
             $room_id = time();
             $conv_data = array('conv_id' => $conv_id, 'room_id' => $room_id, 'addtime' => time(),'expire' => '1');
-			// $conv_data = array('conv_id' => $conv_id, 'room_id' => $room_id, 'addtime' => time());
             pdo_insert($conv_table, $conv_data);
         }
 
@@ -892,20 +882,11 @@ class water_babyModuleSite extends WeModuleSite
         $accObj = WeixinAccount::create($id);
         $access_token = $accObj->fetch_token();
         // var_dump($access_token);
-		if($_COOKIE['jsapi_ticket'])
-		{
-			$jsapi_ticket = $_COOKIE['jsapi_ticket'];
-		}
-		else
-		{
-			$tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
-			$jsapi_ticket = $tmp->ticket;
-			setcookie('jsapi_ticket',$jsapi_ticket,7000);
-			$_COOKIE['jsapi_ticket'] == $jsapi_ticket;
-		}
+        $tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
         $noncestr = 'Wm3WZYTPz0wzccnW';
+        $jsapi_ticket = $tmp->ticket;
         $timestamp = time();
-        $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&eid=6	';
+        $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=doupload&m=water_baby';
         $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
         $signature = sha1($string);
 
@@ -1113,8 +1094,7 @@ class water_babyModuleSite extends WeModuleSite
             'ordersn' => $ordersn, //time(),//date('Ymdhis'), //$chargerecord['tid'],  //收银台中显示的订单号
             'tid' => date('Ymdhis'), //$chargerecord['tid'],      //充值模块中的订单号，此号码用于业务模块中区分订单，交易的识别码
             'fee' => $fee,      //收银台中显示需要支付的金额,只能大于 0
-            // 'user' => $_W['member']['uid'],     //付款用户, 付款的用户名(选填项)
-            'user' => $doctor_id,     //付款用户, 付款的用户名(选填项)
+            'user' => $_W['member']['uid'],     //付款用户, 付款的用户名(选填项)
         );
 
         $_SESSION['doctor_id'] = $doctor_id;
@@ -1689,27 +1669,15 @@ class water_babyModuleSite extends WeModuleSite
             $condition .= "and articletypeid ='{$articletypeid}'";
         }
         $sql = 'SELECT * FROM '.tablename($this->articletable)."
-					WHERE uniacid = '{$_W['uniacid']}' {$condition} ORDER BY articletypeid,indexno desc,addtime desc LIMIT ".($pageNumber - 1) * $pageSize.','.$pageSize;
+					WHERE uniacid = '{$_W['uniacid']}' {$condition} ORDER BY articletypeid,indexno LIMIT ".($pageNumber - 1) * $pageSize.','.$pageSize;
         $list = pdo_fetchall($sql);
         for ($i = 0; $i < count($list); ++$i) {
             $list[$i]['addtime'] = date('Y-m-d', $list[$i]['addtime']);
-            $list[$i]['type_name'] = $this->getArticleTypeName($list[$i]['articletypeid']);
         }
         $total = pdo_fetchcolumn('SELECT COUNT(*) FROM '.tablename($this->articletable)."
 					WHERE uniacid = '{$_W['uniacid']}' {$condition} ORDER BY indexno");
         $pager = pagination($total, $pageNumber, $pageSize);
         include $this->template('article');
-    }
-
-    /**
-     * 获取文章分类名称
-     * @param  string $articletypeid [description]
-     * @return [type]                [description]
-     */
-    public function getArticleTypeName($articletypeid='')
-    {
-        $tmp = pdo_get($this->articletypetable,array('id' => $articletypeid));
-        return $tmp['title'];
     }
 
     /**
@@ -2073,12 +2041,6 @@ class water_babyModuleSite extends WeModuleSite
     }
 
 
-    /**
-     * 根据文章分类或者文章列表
-     * @param  [type] $typeid [description]
-     * @param  [type] $limit  [description]
-     * @return [type]         [description]
-     */
     public function getArticleListByTid($typeid, $limit)
     {
         global $_W;
@@ -2088,12 +2050,7 @@ class water_babyModuleSite extends WeModuleSite
         $state = $groupid == '5'? '1':'2';
 
         $sql = 'SELECT * FROM '.tablename($this->articletable)."
-					WHERE uniacid = '{$_W['uniacid']}' and articletypeid = '{$typeid}' and state = '$state' ORDER BY indexno desc,addtime desc LIMIT ".$limit;
-
-        // $sql = 'SELECT * FROM '.tablename($this->articletable)."
-		// 			WHERE uniacid = '{$_W['uniacid']}' and articletypeid = '{$typeid}' and state = '$state' and indexno = '2' ORDER BY addtime desc";
-        // $sql = 'SELECT * FROM '.tablename($this->articletable)."
-		// 			WHERE uniacid = '{$_W['uniacid']}' and articletypeid = '{$typeid}' and state = '$state' and indexno != '2' ORDER BY addtime desc LIMIT ".$limit;
+					WHERE uniacid = '{$_W['uniacid']}' and articletypeid = '{$typeid}' and state = '$state' ORDER BY indexno LIMIT ".$limit;
         $list = pdo_fetchall($sql);
 
         return $list;

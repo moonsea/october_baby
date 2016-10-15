@@ -90,12 +90,12 @@
             font-size: 16px;
         }
 
-        .mylist li span.left {
+        .mylist li .left {
             background: #ffffff;
         }
 
-        .mylist li span.right {
-            background: #04BE02;
+        .mylist li .right {
+            background: #a1dc2a;
         }
 
         .mylist li img {
@@ -113,6 +113,7 @@
     </style>
     <script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
     <script src="../addons/water_baby/template/js/swipe.js" type="text/javascript"></script>
+    <script src="../addons/water_baby/template/js/idangerous.swiper.min.js" type="text/javascript"></script>
     <script src="../addons/water_baby/template/js/functions.js" type="text/javascript"></script>
     <!-- 引入 LeanCloud 存储 SDK -->
     <!-- <script src="../addons/water_baby/template/js/av-min-1.0.0.js"></script> -->
@@ -125,7 +126,7 @@
     <script src="https://cdn.wilddog.com/sdk/js/2.0.0/wilddog.js"></script>
 </head>
 
-<body style="background:#f2f2f2; padding-top:0;">
+<body style="background:#f2f2f2; padding-top:0;" onLoad="init()">
     <div class="tabbar">
         <div class="weui_tab">
             <div class="weui_tab_bd">
@@ -137,27 +138,14 @@
                 <div id="print-wall" class="print-wall"></div>
             </div>
             <div class="weui_tabbar">
-            	<table width="100%" height="40" align="center" cellpadding="0" cellspacing="0" border="0">
-                	<tr>
-                    	<td width="10%" align="center" valign="middle" height="40">
-                        	<a class="imgBtn" href="javascript:void(0);"></a>
-                        </td>
-                        <td width="75%" align="left" valign="middle">
-                        	<textarea class="Input_text"></textarea>
-                        </td>
-                        <td width="15%" align="center" valign="middle" class="postBtn">
-                        	发送
-                        </td>
-                    </tr>
-                </table>
-                <!--<div class="Input_Box">
+                <div class="Input_Box">
                     <div class="faceDiv"> </div>
                     <div class="Input_Foot">
                         <a class="imgBtn" href="javascript:void(0);"></a>
                         <textarea class="Input_text"></textarea>
-                        <a class="postBtn">发送</a>
+                        <div class="postBtn">发送</div>
                     </div>
-                </div>-->
+                </div>
             </div>
             <div id="temp" style="display:none;">
                 <li>
@@ -394,6 +382,8 @@
                 });
                 $(".imgBtn").click(function() {
                     if (isShowImg == false) {
+						$(".Input_Foot").css("border-top","1px solid #ccc");
+						$(".imgBtn").css("background-image","url(../addons/water_baby/template/img/smile-hover.png)");
                         isShowImg = true;
                         $(this).parent().prev().animate({
                             bottom: "45px"
@@ -412,13 +402,14 @@
                         }
                     } else {
                         isShowImg = false;
+						$(".Input_Foot").css("border-top","0");
+						$(".imgBtn").css("background-image","url(../addons/water_baby/template/img/smile.png)");
                         $(this).parent().prev().animate({
                             bottom: "-190px"
                         }, 300);
                     }
                 });
                 $(".postBtn").click(function() {
-                    //alert($(".Input_text").val());
                     //发送文字
                     var text = $(".Input_text").val();
                     $(".Input_text").val("");
@@ -452,6 +443,7 @@
                 }
             }
         }
+		
     </script>
     <script type="text/javascript">
         // 初始化
@@ -521,7 +513,7 @@
                 // console.log(clientId);
                 // console.log("NEW MESSAGE");
                 if (String(text).replace(/^\s+/, '').replace(/\s+$/, '')) {
-                    $("#temp1 li span.left").html(text);
+                    $("#temp1 li .left").html(text);
                     if (isBefore) {
                         //$(".mylist").insertBefore($("#temp1").html(),document.getElementById("mylist").childNodes[0]);
                         var temp = $(".mylist").html();
@@ -530,11 +522,14 @@
                     } else {
                         $(".mylist").append($("#temp1").html());
                     }
+					//定义下拉刷新
+					myslide();
+					
                 }
             } else {
                 if (String(text).replace(/^\s+/, '').replace(/\s+$/, '')) {
                     //showLog('（' + formatTime(message.timestamp) + '）  ' + encodeHTML(from) + '： ', encodeHTML(message.text), isBefore);
-                    $("#temp li span.right").html(text);
+                    $("#temp li .right").html(text);
                     if (isBefore) {
                         //$(".mylist").insertBefore($("#temp1").html(),document.getElementById("mylist").childNodes[0]);
                         var temp = $(".mylist").html();
@@ -554,7 +549,7 @@
         function sendMsg(text) {
 
             var val = text;
-
+			
             // 不让发送空字符
             if (!String(val).replace(/^\s+/, '').replace(/\s+$/, '')) {
                 alert('请输入点文字！');
@@ -656,418 +651,48 @@
         // presenceRef.onDisconnect().set('disconnected');
         presenceRef.onDisconnect().update({
             "status": "disconnected"
-        });
+        });	
     </script>
-    <!-- <script src="https://cdn.wilddog.com/sdk/js/2.0.0/wilddog.js">
-
-        /* 实例 */
-        var ref = new Wilddog("https://october-baby.wilddogio.com/");
-
-        // 每个客户端自定义的 id
-        var clientId = "{$_W['member']['uid']}";
-        var doctorId = "{$doctor_info['uid']}";
-
-        $().ready(function(e) {
-            initSlide();
-            ImgIputHandler.Init();
-
-            bindEvent(sendBtn, 'click', sendMsg);
-
-            onValue();
-
-
-
-            // AV.initialize(appId, appKey);
-            //
-            // // 创建实时通信实例
-            // realtime = new AV.Realtime({
-            //     appId: appId,
-            //     appKey: appKey,
-            //     plugins: AV.TypedMessagesPlugin,
-            // });
-
-            // 初始化聊天室，并获取聊天记录
-            // main();
-
-        });
-
-        /**
-         * 监听消息
-         * @return {[type]} [description]
-         */
-        function onValue() {
-            alert('msg');
-            ref.on("value", function(snapshot) {
-                message = snapshot.val();
-                console.log(message);
-                showMsg(message);
-            });
-        }
-
-        // 显示接收到的信息
-        function showMsg(message, isBefore) {
-            var text = message.text;
-            var from = message.from;
-            var isBefore = arguments[1] ? arguments[1] : false
-            console.log(isBefore);
-            if (message.from != clientId) {
-                console.log("NEW MESSAGE");
-                if (message instanceof AV.TextMessage) {
-                    if (String(text).replace(/^\s+/, '').replace(/\s+$/, '')) {
-                        //showLog('（' + formatTime(message.timestamp) + '）  ' + encodeHTML(from) + '： ', encodeHTML(message.text), isBefore);
-                        $("#temp1 li span.left").html(text);
-                        if (isBefore) {
-                            //$(".mylist").insertBefore($("#temp1").html(),document.getElementById("mylist").childNodes[0]);
-                            var temp = $(".mylist").html();
-                            $(".mylist").html($("#temp1").html());
-                            $(".mylist").append(temp);
-                        } else {
-                            $(".mylist").append($("#temp1").html());
-                        }
-                    }
-                }
-            } else {
-                if (message instanceof AV.TextMessage) {
-                    if (String(text).replace(/^\s+/, '').replace(/\s+$/, '')) {
-                        //showLog('（' + formatTime(message.timestamp) + '）  ' + encodeHTML(from) + '： ', encodeHTML(message.text), isBefore);
-                        $("#temp li span.right").html(text);
-                        if (isBefore) {
-                            //$(".mylist").insertBefore($("#temp1").html(),document.getElementById("mylist").childNodes[0]);
-                            var temp = $(".mylist").html();
-                            $(".mylist").html($("#temp").html());
-                            $(".mylist").append(temp);
-                        } else {
-                            $(".mylist").append($("#temp").html());
-                        }
-                    }
-                }
-            }
-        }
-
-        /**
-         * 发送消息
-         * @return {[type]} [description]
-         */
-        function sendMsg(text) {
-
-            var val = text;
-
-            // 不让发送空字符
-            if (!String(val).replace(/^\s+/, '').replace(/\s+$/, '')) {
-                alert('请输入点文字！');
-            }
-
-            ref.push({
-                from: clientId,
-                to: doctorId,
-                text: text,
-                timestamp: Date.parse(new Date())
-            });
-            //
-            //
-            // // 向这个房间发送消息，这段代码是兼容多终端格式的，包括 iOS、Android、Window Phone
-            // room.send(new AV.TextMessage(val)).then(function(message) {
-            //     // 发送成功之后的回调
-            //     //inputSend.value = '';
-            //     console.log(message);
-            //     //showLog('（' + formatTime(message.timestamp) + '）  自己： ', encodeHTML(message.text));
-            //     //printWall.scrollTop = printWall.scrollHeight;
-            // });
-
-        }
-
-        /* 绑定事件 */
-        function bindEvent(dom, eventName, fun) {
-            if (window.addEventListener) {
-                dom.addEventListener(eventName, fun);
-            } else {
-                dom.attachEvent('on' + eventName, fun);
-            }
-        }
-
-
-
-        /**
-         * 初始化聊天室
-         * @return {[type]} [description]
-        //  */
-        // function main() {
-        //     //   showLog('正在连接服务器，请等待。。。');
-        //     if (!firstFlag) {
-        //         client.close();
-        //     }
-        //
-        //     alert(clientId);
-        //     // 创建聊天客户端
-        //     realtime.createIMClient(clientId.toString())
-        //         .then(function(c) {
-        //             // showLog('服务器连接成功！');
-        //             firstFlag = false;
-        //             client = c;
-        //             client.on('disconnect', function() {
-        //                 alert('服务器正在重连，请耐心等待。。。');
-        //             });
-        //             // 获取对话
-        //             return c.getConversation(roomId);
-        //         }) {
-        //             if $room_id == ""
-        //         }
-        //         .then(function(conversation) {
-        //             if (conversation) {
-        //                 return conversation;
-        //             } else {
-        //                 // 如果服务器端不存在这个 conversation
-        //                 return client.createConversation({
-        //                     name: doctor_name,
-        //                     members: [
-        //                         // 默认包含当前用户
-        //                         doctor_id.toString()
-        //                         //   doctor_mobile
-        //                     ],
-        //                 }).then(function(conversation) {
-        //                     roomId = conversation.id;
-        //                     alert(roomId);
-        //                     console.log('创建新 Room 成功，id 是：', roomId);
-        //
-        //                     /* 保存创建roomId */
-        //                     var href = "{php echo $this->createMobileUrl('SaveRoomId');}";
-        //                     $.post(href, {
-        //                         'conv_id': {
-        //                             $chat_info['id']
-        //                         },
-        //                         'room_id': roomId
-        //                     }, function(data) {
-        //                         console.log(data);
-        //                         data = $.parseJSON(data);
-        //                         if (data.type == 'success') {
-        //                             //  return conversation;
-        //                             //  return client.getConversation(roomId);
-        //                             location.href = data.redirect;
-        //                         } else {
-        //                             alert(data.message);
-        //                         }
-        //                     });
-        //                     return conversation;
-        //                 });
-        //             }
-        //
-        //         }) {
-        //             /if}
-        //             .then(function(conversation) {
-        //                     return conversation.join();
-        //                 })
-        //                 .then(function(conversation) {
-        //                         // 获取聊天历史
-        //                         room = conversation; {
-        //                             if $room_id == ""
-        //                         }
-        //                         sendMsg('你好'); {
-        //                             /if}
-        //
-        //                             messageIterator = conversation.createMessagesIterator();
-        //                             getLog(function() {
-        //                                 //   printWall.scrollTop = printWall.scrollHeight;
-        //                                 showLog('已经加入，可以开始聊天。');
-        //                             });
-        //
-        //                             // 房间接受消息
-        //                             conversation.on('message', function(message) {
-        //                                 if (!msgTime) {
-        //                                     // 存储下最早的一个消息时间戳
-        //                                     msgTime = message.timestamp;
-        //                                 }
-        //                                 showMsg(message);
-        //                             });
-        //                         })
-        //                     .catch(function(err) {
-        //                         console.error(err);
-        //                     });
-        //                 }
-        //
-        //             // 获取消息历史
-        //             function getLog(callback) {
-        //                 //var height = printWall.scrollHeight;
-        //                 if (logFlag) {
-        //                     return;
-        //                 } else {
-        //                     // 标记正在拉取
-        //                     logFlag = true;
-        //                 }
-        //                 messageIterator.next().then(function(result) {
-        //                     var data = result.value;
-        //                     logFlag = false;
-        //                     // 存储下最早一条的消息时间戳
-        //                     var l = data.length;
-        //                     if (l) {
-        //                         msgTime = data[0].timestamp;
-        //                     }
-        //                     for (var i = l - 1; i >= 0; i--) {
-        //                         showMsg(data[i], true);
-        //                     }
-        //                     if (l) {
-        //                         //printWall.scrollTop = printWall.scrollHeight - height;
-        //                     }
-        //                     if (callback) {
-        //                         callback();
-        //                     }
-        //                 }).catch(function(err) {
-        //                     console.error(err);
-        //                 });
-        //             }
-        //
-        //
-        //
-        //             // 拉取历史
-        //             bindEvent(printWall, 'scroll', function(e) {
-        //                 if (printWall.scrollTop < 20) {
-        //                     getLog();
-        //                 }
-        //             });
-        //
-        //             // demo 中输出代码
-        //             function showLog(msg, data, isBefore) {
-        //                 if (data) {
-        //                     // console.log(msg, data);
-        //                     msg = msg + '<span class="strong">' + data + '</span>';
-        //                 }
-        //                 var p = document.createElement('p');
-        //                 p.innerHTML = msg;
-        //                 if (isBefore) {
-        //                     printWall.insertBefore(p, printWall.childNodes[0]);
-        //                 } else {
-        //                     printWall.appendChild(p);
-        //                 }
-        //             }
-        //
-        //             function encodeHTML(source) {
-        //                 return String(source)
-        //                     .replace(/&/g, '&amp;')
-        //                     .replace(/</g, '&lt;')
-        //                     .replace(/>/g, '&gt;')
-        //                     .replace(/\\/g, '&#92;')
-        //                     .replace(/"/g, '&quot;')
-        //                     .replace(/'/g, '&#39;');
-        //             }
-        //
-        //             function formatTime(time) {
-        //                 var date = new Date(time);
-        //                 var month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
-        //                 var currentDate = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
-        //                 var hh = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-        //                 var mm = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-        //                 var ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-        //                 return date.getFullYear() + '-' + month + '-' + currentDate + ' ' + hh + ':' + mm + ':' + ss;
-        //             }
-        //
-        //             function createLink(url) {
-        //                 return '<a target="_blank" href="' + encodeHTML(url) + '">' + encodeHTML(url) + '</a>';
-        //             }
-        //
-        //             function bindEvent(dom, eventName, fun) {
-        //                 if (window.addEventListener) {
-        //                     dom.addEventListener(eventName, fun);
-        //                 } else {
-        //                     dom.attachEvent('on' + eventName, fun);
-        //                 }
-        //             }
-        //
-        //             // demo 中输出代码
-        //             function showLog(msg, data, isBefore) {
-        //                 if (data) {
-        //                     // console.log(msg, data);
-        //                     msg = msg + '<span class="strong">' + data + '</span>';
-        //                 }
-        //                 var p = document.createElement('p');
-        //                 p.innerHTML = msg;
-        //                 if (isBefore) {
-        //                     printWall.insertBefore(p, printWall.childNodes[0]);
-        //                 } else {
-        //                     printWall.appendChild(p);
-        //                 }
-        //             }
-        //
-        //             function encodeHTML(source) {
-        //                 return String(source)
-        //                     .replace(/&/g, '&amp;')
-        //                     .replace(/</g, '&lt;')
-        //                     .replace(/>/g, '&gt;')
-        //                     .replace(/\\/g, '&#92;')
-        //                     .replace(/"/g, '&quot;')
-        //                     .replace(/'/g, '&#39;');
-        //             }
-        //
-        //             function formatTime(time) {
-        //                 var date = new Date(time);
-        //                 var month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
-        //                 var currentDate = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
-        //                 var hh = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-        //                 var mm = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-        //                 var ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-        //                 return date.getFullYear() + '-' + month + '-' + currentDate + ' ' + hh + ':' + mm + ':' + ss;
-        //             }
-        //
-        //             function createLink(url) {
-        //                 return '<a target="_blank" href="' + encodeHTML(url) + '">' + encodeHTML(url) + '</a>';
-        //             }
-        //
-        //             /**
-        //              * 发送消息
-        //              * @return {[type]} [description]
-        //              */
-        //             function sendMsg(text) {
-        //
-        //                 var val = text;
-        //                 // 不让发送空字符
-        //                 if (!String(val).replace(/^\s+/, '').replace(/\s+$/, '')) {
-        //                     alert('请输入点文字！');
-        //                 }
-        //
-        //                 // 向这个房间发送消息，这段代码是兼容多终端格式的，包括 iOS、Android、Window Phone
-        //                 room.send(new AV.TextMessage(val)).then(function(message) {
-        //                     // 发送成功之后的回调
-        //                     //inputSend.value = '';
-        //                     console.log(message);
-        //                     //showLog('（' + formatTime(message.timestamp) + '）  自己： ', encodeHTML(message.text));
-        //                     //printWall.scrollTop = printWall.scrollHeight;
-        //                 });
-        //
-        //             }
-        //
-        //             $(document).ready(function() {
-        //                 var range = 50; //距下边界长度/单位px
-        //                 var elemt = 50; //插入元素高度/单位px
-        //                 var maxnum = 2000; //设置加载最多次数
-        //                 var num = 1;
-        //                 var totalheight = 0;
-        //                 var main = $(".mylist"); //主体元素
-        //                 $(window).scroll(function() {
-        //                     var srollPos = $(window).scrollTop(); //滚动条距顶部距离(页面超出窗口的高度)
-        //
-        //                     //console.log("滚动条到顶部的垂直高度: "+$(document).scrollTop());
-        //                     //console.log("页面的文档高度 ："+$(document).height());
-        //                     //console.log('浏览器的高度：'+$(window).height());
-        //
-        //                     totalheight = parseFloat($(window).height()) + parseFloat(srollPos);
-        //                     if (($(document).height() - range) <= totalheight && num != maxnum) {
-        //                         main.append("<div style='border:1px solid tomato;margin-top:20px;color:#ac" + (num % 20) + (num % 20) + ";height:" + elemt + "' >hello world" + srollPos + "---" + num + "</div>");
-        //                         num++;
-        //                     }
-        //                 });
-        //             });
-    </script> -->
-    <!-- {if $room_id != ''}
-    <script type="text/javascript">
-        function myclose() {
-            // window.event.returnValue="quit";
-            // alert('msg');
-            // console.log('myclose');
-            //     if       (event.clientX>document.body.clientWidth       &&       event.clientY<0||event.altKey)
-            // {
-            window.event.returnValue = "确定要退出聊天吗？";
-            // }
-        }
-    </script>
-    {/if} -->
+    <script>
+	var isfirst = ture;
+	function myslide()
+	{
+		if(isfirst)
+		{
+			holdPosition = 0;
+			mySwiper = new Swiper('.mylist',{
+				slidesPerView:'auto',
+				mode:'vertical',
+				watchActiveIndex: true,
+				onTouchStart: function() {
+				  holdPosition = 0;
+				},
+				onResistanceBefore: function(s, pos){
+				  holdPosition = pos;
+				},
+				onTouchEnd: function(){
+				  if (holdPosition>20) {
+					mySwiper.setWrapperTranslate(0,20,0)
+					mySwiper.params.onlyExternal=true
+					$('.preloader').addClass('visible');
+					loadNewSlides();
+				  }
+				}
+			});
+			isfirst = false;
+		}
+	}
+	function loadNewSlides()
+	{
+	 	alert("load");
+	}
+	/*$().ready(function(e) {
+        {loop $chat_list $item}
+            getLog({$item['room_id']});
+        {/loop}
+		
+    });*/
+	</script>
 </body>
 
 </html>

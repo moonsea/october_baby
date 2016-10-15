@@ -153,7 +153,7 @@ a:visited{text-decoration:none;}
 	<ul class="mui-table-view mui-table-view-chevron">
 		{if empty($profile_hide)}
 		<li class="mui-table-view-cell">
-			<a href="{php echo url('mc/profile') . 'wxref=mp.weixin.qq.com#wechat_redirect'}" class="mui-navigate-right">个人资料</a>
+			<a href="{php echo url('mc/profile',array('title' => '个人资料')) . 'wxref=mp.weixin.qq.com#wechat_redirect'}" class="mui-navigate-right">个人资料</a>
 		</li>
 		{/if}
 		<!-- <li class="mui-table-view-cell">

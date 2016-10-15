@@ -1,7 +1,7 @@
 {php define('MUI', true);}
 {template 'common/header'}
 <form class="tab-content clearfix js-ajax-form {if $_W['container'] !== 'wechat'}profile-form{/if}" action="{url 'mc/profile/editprofile'}" method="post" enctype="multipart/form-data">
-<div class="mui-content {if $do == 'index'}mc-profile{/if}">
+<div class="mui-content {if $do == 'index'}mc-profile{/if}" style="padding-top:0px;">
 {if $do == 'index'}
 	{if !empty($mcFields['avatar'])}
 	{php echo tpl_app_form_field_avatar('avatar', $profile['avatar']);}
@@ -37,9 +37,14 @@
 			{php echo tpl_app_fans_form('reside', array('province' => $profile['resideprovince'], 'city' => $profile['residecity'], 'district' => $profile['residedist']), $mcFields['resideprovince']['title']);}
 		</div>
 		{/if}
-		<div class="mui-input-row">
+		<div class="mui-input-row" style="height:auto; min-height:40px; overflow:auto;">
 			<label>个人简介</label>
 			{php echo tpl_app_fans_form('bio', $profile['bio'], $mcFields['bio']['title']);}
+            <script>
+				$().ready(function(e) {
+                    $("textarea").css("height",document.getElementsByName("bio")[0].scrollHeight);
+                });
+			</script>
 		</div>
 	</div>
 	<!-- <ul class="mui-table-view mui-table-view-chevron">
@@ -67,9 +72,15 @@
 {/if}
 {if $do == 'chat_price'}
 	<div class="mui-input-group mui-mt15">
+		<div class="mui-table-view-cell">
+			<label>我的收入</label>
+			<span class="mui-pull-right"><span class="mui-mr10">{$total_price['total_price']}</span></span>
+		</div>
+	</div>
+	<div class="mui-input-group mui-mt15">
 		<div class="mui-input-row">
-			<label>默认费用</label>
-			{php echo tpl_app_fans_form('revenue', $profile['revenue'], '');}
+			<label>咨询费用</label>
+			{php echo tpl_app_fans_form('revenue', $profile['revenue'], '咨询费用');}
 		</div>
 	</div>
 {/if}

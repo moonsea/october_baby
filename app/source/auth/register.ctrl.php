@@ -14,7 +14,8 @@ $item = $setting['passport']['item'] ? $setting['passport']['item'] : 'mobile';
 $audit = @intval($setting['passport']['audit']);
 $ltype = empty($setting['passport']['type']) ? 'hybird' : $setting['passport']['type'];
 $rtype = trim($_GPC['type']) ? trim($_GPC['type']) : 'email';
-$forward = url('mc');
+// $forward = url('mc');
+$forward = url('entry', array('do' => 'my','m' => 'water_baby'));
 if(!empty($_GPC['forward'])) {
 	$forward = './index.php?' . base64_decode($_GPC['forward']) . '#wechat_redirect';
 }

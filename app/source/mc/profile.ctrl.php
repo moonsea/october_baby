@@ -5,7 +5,7 @@
  */
 defined('IN_IA') or exit('Access Denied');
 load()->model('app');
-$title = $_W['account']['name'] . '微站';
+$title = '我的账户';
 $dos = array('index', 'editprofile', 'personal_info', 'contact_method', 'education_info', 'jobedit', 'avatar', 'address', 'addressadd', 'chat_price');
 $do = in_array($do, $dos) ? $do : 'index';
 $navs = app_navs('profile');
@@ -66,7 +66,7 @@ if ($do == 'editprofile'){
 			}
 			mc_update($_W['member']['uid'], $_GPC);
 		}
-		message('更新资料成功！', referer(), 'success');
+		message('更新资料成功！', url('mc/bond/settings'), 'success');
 	}
 }
 if ($do == 'avatar') {
@@ -74,6 +74,10 @@ if ($do == 'avatar') {
 	if (mc_update($_W['member']['uid'], $avatar)) {
 		message('头像设置成功！', referer(), 'success');
 	}
+}
+if ($do == 'chat_price') {
+	$sql = "SELECT sum(fee) as total_price FROM ".tablename('water_baby_pay_log')."WHERE status = 1 and doctor_id = '".$_W['member']['uid']."'";
+	$total_price = pdo_fetch($sql);
 }
 
 if ($do == 'address') {

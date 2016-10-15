@@ -5,8 +5,8 @@
  */
 defined('IN_IA') or exit('Access Denied');
 load()->model('app');
-$dos = array('display', 'credits', 'address', 'card', 'mycard', 'record', 
-			'mobile', 'email', 'consume', 'card_qrcode', 
+$dos = array('display', 'credits', 'address', 'card', 'mycard', 'record',
+			'mobile', 'email', 'consume', 'card_qrcode',
 			'addressadd', 'settings', 'accountsecurity', 'password', 'aboutus');
 $do = in_array($do, $dos) ? $do : 'display';
 load()->func('tpl');
@@ -18,7 +18,7 @@ if ($do == 'credits') {
 	$params = array(':uid' => $_W['member']['uid']);
 	$pindex = max(1, intval($_GPC['page']));
 	$psize = 15;
-	
+
 	$period = intval($_GPC['period']);
 	if ($period == '1') {
 		$starttime = date('Ym01',strtotime(0));
@@ -33,11 +33,11 @@ if ($do == 'credits') {
 	$where = ' AND `createtime` >= :starttime AND `createtime` < :endtime';
 	$params[':starttime'] = strtotime($starttime);
 	$params[':endtime'] = strtotime($endtime);
-	
+
 	$sql = 'SELECT `realname`, `avatar` FROM ' . tablename('mc_members') . " WHERE `uid` = :uid";
 	$user = pdo_fetch($sql, array(':uid' => $_W['member']['uid']));
 	if ($_GPC['credittype']) {
-		
+
 		if ($_GPC['type'] == 'order') {
 			$sql = 'SELECT * FROM ' . tablename('mc_credits_recharge') . " WHERE `uid` = :uid $where LIMIT " . ($pindex - 1) * $psize. ',' . $psize;
 			$orders = pdo_fetchall($sql, $params);
@@ -49,7 +49,7 @@ if ($do == 'credits') {
 				}
 				unset($value);
 			}
-			
+
 			$ordersql = 'SELECT COUNT(*) FROM ' .tablename('mc_credits_recharge') . "WHERE `uid` = :uid {$where}";
 			$total = pdo_fetchcolumn($ordersql, $params);
 			$orderpager = pagination($total, $pindex, $psize, '', array('before' => 0, 'after' => 0, 'ajaxcallback' => ''));
@@ -58,8 +58,8 @@ if ($do == 'credits') {
 		}
 		$where .= " AND `credittype` = '{$_GPC['credittype']}'";
 	}
-	
-	
+
+
 	$sql = 'SELECT `num` FROM ' . tablename('mc_credits_record') . " WHERE `uid` = :uid $where";
 	$nums = pdo_fetchall($sql, $params);
 	$pay = $income = 0;
@@ -74,7 +74,7 @@ if ($do == 'credits') {
 		$pay = number_format($pay, 2);
 		$income = number_format($income, 2);
 	}
-	
+
 	$sql = 'SELECT * FROM ' . tablename('mc_credits_record') . " WHERE `uid` = :uid {$where} ORDER BY `createtime` DESC LIMIT " . ($pindex - 1) * $psize.','. $psize;
 	$data = pdo_fetchall($sql, $params);
 	foreach ($data as $key=>$value) {
@@ -91,7 +91,7 @@ if ($do == 'credits') {
 		$data[$key]['remark'] = str_replace('credit2', '余额', $data[$key]['remark']);
 		$data[$key]['remark'] = empty($data[$key]['remark']) ? '未记录' : $data[$key]['remark'];
 	}
-	
+
 	$pagesql = 'SELECT COUNT(*) FROM ' .tablename('mc_credits_record') . "WHERE `uid` = :uid {$where}";
 	$total = pdo_fetchcolumn($pagesql, $params);
 	$pager = pagination($total, $pindex, $psize, '', array('before' => 0, 'after' => 0, 'ajaxcallback' => ''));
@@ -100,7 +100,7 @@ if ($do == 'credits') {
 		if (!empty($data)){
 			exit(json_encode($data));
 		} else {
-			exit(json_encode(array('state'=>'error'))); 
+			exit(json_encode(array('state'=>'error')));
 		}
 	}
 	$type = trim($_GPC['type']);
@@ -386,6 +386,7 @@ if ($do == 'email') {
 	}
 }
 if ($do == 'settings') {
+	$title = '我的账户';
 	$reregister = false;
 	if ($_W['member']['email'] == md5($_W['openid']).'@we7.cc') {
 		$reregister = true;

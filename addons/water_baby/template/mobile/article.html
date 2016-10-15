@@ -6,9 +6,20 @@
 <title>{$article['title']}</title>
 <link href="../addons/water_baby/template/css/article.css" rel="stylesheet" type="text/css">
 <script src="../addons/water_baby/template/js/jquery.min.js"></script>
+<style>
+#toast{
+    width:100px; height: 110px; position: fixed;
+    left: 50%; top: 50%; margin-left: -50px; margin-top: -55px;
+    background: rgba(0,0,0,0.6);
+    color:#fff; font-size: 20px; text-align: center;
+    border-radius: 4px;
+}
+#toast p{
+    margin: 0;
+}
+</style>
 </head>
-
-<body>
+<body style="padding:0; margin:0;">
     <!-- <div class="title" style="font-size:20px; text-align:left;">{$article['title']}</div> -->
     <!-- <div class="weui_media_bd">
         <p class="weui_media_desc" style="margin-top:8px;">
@@ -17,18 +28,47 @@
             <time class="fr">{$article['addtime']}</time>
         </p>
     </div> -->
+    {if isset($_GET['from'])}
+            <div style="width:100%; background:#ffe7e7; color:#ffb678; font-size:20px;">
+                <table width="100%" cellspading="0" cellspace="0" border="0">
+                    <tr>
+                        <td width="20%" height="50" align="left" valign="middle">
+                            <img src="http://shiyue.october-baby.com/baby/attachment/headimg_4.jpg?time=1476335432" height="50">
+                        </td>
+                        <td width="60%" align="center" valign="middle">
+                            十月宝宝
+                        </td>
+                        <td width="10%">
+                            <a href="{php echo url('auth/register')}" style="color:#beb0af; text-decoration:none; font-size:14px;">注册</a>
+                        </td>
+                        <td width="10%">
+                            <a href="{php echo $this->createMobileUrl('my')}" style="color:#beb0af; text-decoration:none; font-size:14px;">登录</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+    {/if}
     <div class="content">
         {$article['content']}
     </div>
-    <div class="weui_media_bd">
-        <p class="weui_media_desc" style="margin-top:8px;float:right">
+    <div class="weui_media_bd" style="height:auto; min-height:24px; overflow:auto;">
+        <p class="weui_media_desc" style="margin-right:20px;float:right">
             <!-- 发布时间： <time class="fr">{$article['addtime']}</time>
             &nbsp;&nbsp;&nbsp;&nbsp; -->
-            <img src="../addons/water_baby/template/img/icons/{if $fav_status == '1'}favorite_active.png{else}favorite.png{/if}" width="20" height="20" onclick="fav({$article['id']},{$fav_status})"/>
+            <img id="fav_img" src="../addons/water_baby/template/img/icons/{if $fav_status == '1'}favorite_active.png{else}favorite.png{/if}" width="24" height="24" onclick="fav({$article['id']},{$fav_status})"/>
             <!-- <span>{$fav_count}</span> -->
         </p>
     </div>
+    <p>&nbsp;</p>
+
+    <div id="toast">
+        <img src="../addons/water_baby/template/img/icons/favorite_active.png"/>
+        <p>收藏成功</p>
+    </div>
+
+
     <script type="text/javascript">
+      $("#toast").hide();
       function fav(id, fav_status) {
         var href = "{php echo $this->createMobileUrl('FavArticle');}";
         $.post(href, {'article_id' : id, 'fav_status' : fav_status}, function(data) {
@@ -36,13 +76,40 @@
           data = $.parseJSON(data);
 
           if (data.type == 'success') {
-            location.href = data.redirect;
+            //location.href = data.redirect;
             // location.reload();
+            if($("#fav_img").attr("src")=="../addons/water_baby/template/img/icons/favorite_active.png")
+            {
+                $("#fav_img").attr("src","../addons/water_baby/template/img/icons/favorite.png");
+                // toast('取消收藏');
+                $("#toast img").attr("src","../addons/water_baby/template/img/icons/favorite.png");
+                $("#toast p").html("取消收藏");
+                $("#toast").fadeIn(100);
+                setTimeout(function () {
+                    $("#toast").fadeOut(100);
+                }, 2000);
+            }
+            else
+            {
+                $("#fav_img").attr("src","../addons/water_baby/template/img/icons/favorite_active.png");
+                // toast('收藏成功');
+                $("#toast img").attr("src","../addons/water_baby/template/img/icons/favorite_active.png");
+                $("#toast p").html("收藏成功");
+                $("#toast").fadeIn(100);
+                setTimeout(function () {
+                    $("#toast").fadeOut(100);
+                }, 2000);
+            }
           } else {
             alert(data.message);
-            // util.toast(data.message);
+             toast(data.message);
           }
         })
+      }
+
+      function toast()
+      {
+
       }
     </script>
 </body>
