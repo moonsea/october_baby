@@ -76,18 +76,17 @@ class water_babyModuleSite extends WeModuleSite
         // $accObj = WeixinAccount::create($id);
         // $access_token = $accObj->fetch_token();
         $access_token = $this->getToken();
-        // var_dump($access_token);
-		if($_COOKIE['jsapi_ticket'])
-		{
-			$jsapi_ticket = $_COOKIE['jsapi_ticket'];
-		}
-		else
-		{
-			$tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
-			$jsapi_ticket = $tmp->ticket;
-			setcookie('jsapi_ticket',$jsapi_ticket,7000);
-			$_COOKIE['jsapi_ticket'] == $jsapi_ticket;
-		}
+        if($_COOKIE['jsapi_ticket'])
+    		{
+    			$jsapi_ticket = $_COOKIE['jsapi_ticket'];
+    		}
+    		else
+    		{
+    			$tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
+    			$jsapi_ticket = $tmp->ticket;
+    			setcookie('jsapi_ticket',$jsapi_ticket,7000);
+    			$_COOKIE['jsapi_ticket'] == $jsapi_ticket;
+    		}
         $noncestr = 'Wm3WZYTPz0wzccnW';
         $timestamp = time();
         $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=index&m=water_baby';
@@ -280,6 +279,23 @@ class water_babyModuleSite extends WeModuleSite
             }
         }
 
+        $access_token = $this->getToken();
+        if($_COOKIE['jsapi_ticket'])
+    		{
+    			$jsapi_ticket = $_COOKIE['jsapi_ticket'];
+    		}
+    		else
+    		{
+    			$tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
+    			$jsapi_ticket = $tmp->ticket;
+    			setcookie('jsapi_ticket',$jsapi_ticket,7000);
+    			$_COOKIE['jsapi_ticket'] == $jsapi_ticket;
+    		}
+        $noncestr = 'Wm3WZYTPz0wzccnW';
+        $timestamp = time();
+        $url = "http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&type=".$_GET['type']."&doctor_id=".$_GET['doctor_id']."&room_id=".$_GET['room_id']."&do=chat&m=water_baby";
+        $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
+        $signature = sha1($string);
         include $this->template('chat');
     }
 
@@ -366,6 +382,24 @@ class water_babyModuleSite extends WeModuleSite
             $chat_info = pdo_get($conv_table, array('conv_id' => $conv_id, 'room_id' => $room_id));
         }
         $replytime = intval($chat_info['replytime']);
+
+        $access_token = $this->getToken();
+        if($_COOKIE['jsapi_ticket'])
+    		{
+    			$jsapi_ticket = $_COOKIE['jsapi_ticket'];
+    		}
+    		else
+    		{
+    			$tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
+    			$jsapi_ticket = $tmp->ticket;
+    			setcookie('jsapi_ticket',$jsapi_ticket,7000);
+    			$_COOKIE['jsapi_ticket'] == $jsapi_ticket;
+    		}
+        $noncestr = 'Wm3WZYTPz0wzccnW';
+        $timestamp = time();
+        $url = "http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&conv_id=".$_GET['conv_id']."&type=".$_GET['type']."&do=DoctorChat&m=water_baby";
+        $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
+        $signature = sha1($string);
 
         include $this->template('doctor_chat');
     }
@@ -806,7 +840,7 @@ class water_babyModuleSite extends WeModuleSite
 
         checkauth();
 
-        $uid = $_W['member']['uid'];
+        $uid = empty($_GPC['user_id'])?$_W['member']['uid']:$_GPC['user_id'];
 
         /* 获取个人信息 */
         $mem_info = pdo_get('mc_members', array('uid' => $uid));
@@ -905,11 +939,26 @@ class water_babyModuleSite extends WeModuleSite
 		}
         $noncestr = 'Wm3WZYTPz0wzccnW';
         $timestamp = time();
-        $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&eid=6	';
+        $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=doupload&m=water_baby';
         $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
         $signature = sha1($string);
 
         include $this->template('do_upload');
+    }
+
+    public function doMobileSaveImage()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $media_id = $_GPC['media_id'];
+
+        $img_src = $this->saveImage($media_id,'chat');
+
+        $img_src = 'http://shiyue.october-baby.com/baby'.substr($img_src,2);
+
+        echo $img_src;
     }
 
     /**
@@ -1607,6 +1656,32 @@ class water_babyModuleSite extends WeModuleSite
         message('','','success');
         // return $data;
 
+    }
+
+    /**
+     * 医生值班表
+     * @return [type] [description]
+     */
+    public function doMobileDoctor3View()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $doctor_id = $_GPC['doctor_id'];
+
+        $mem_doctor = $this->getMemInfo($doctor_id);
+
+        include $this->template('doctor3view');
+    }
+
+    public function doMobileViewWeight()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        include $this->template('view_weight');
     }
 
 

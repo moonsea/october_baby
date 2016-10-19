@@ -105,16 +105,22 @@
             -webkit-border-radius: 999px;
             -ms-border-radius: 999px;
         }
+        .mylist li span img#emo{
+          width: 24px;
+          height: 24px;
+        }
 
         .mylist li span img {
-            width: 24px;
-            height: 24px;
+            width: 200px;
+            border-radius: 8px;
+            height: auto;
         }
     </style>
     <script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
     <script src="../addons/water_baby/template/js/swipe.js" type="text/javascript"></script>
     <script src="../addons/water_baby/template/js/idangerous.swiper.min.js" type="text/javascript"></script>
     <script src="../addons/water_baby/template/js/functions.js" type="text/javascript"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
     <!-- 引入 LeanCloud 存储 SDK -->
     <!-- <script src="../addons/water_baby/template/js/av-min-1.0.0.js"></script> -->
     <!-- 引入 LeanCloud 实时通信 SDK -->
@@ -126,7 +132,7 @@
     <script src="https://cdn.wilddog.com/sdk/js/2.0.0/wilddog.js"></script>
 </head>
 
-<body style="background:#f2f2f2; padding-top:0;" onLoad="init()">
+<body style="background:#f2f2f2; padding-top:0;">
     <div class="tabbar">
         <div class="weui_tab">
             <div class="weui_tab_bd">
@@ -142,20 +148,101 @@
                     <div class="faceDiv"> </div>
                     <div class="Input_Foot">
                         <a class="imgBtn" href="javascript:void(0);"></a>
-                        <textarea class="Input_text"></textarea>
-                        <div class="postBtn">发送</div>
+                        <textarea class="Input_text" onkeyup="cha()"></textarea>
+                        <div class="postBtn">
+                          <font id="send_btn" style="display:none;" >发送</font>
+                          <img onclick="send_img()" src="../addons/water_baby/template/img/photo.png" id="add_btn" style="max-height:62%; margin-top:18%;"/>
+                        </div>
                     </div>
                 </div>
             </div>
+            <script type="text/javascript">
+              function cha()
+              {
+                if($("textarea").val().length > 0)
+                {
+                  $("#send_btn").css("display","");
+                  $("#add_btn").css("display","none");
+                }
+                else {
+                  $("#send_btn").css("display","none");
+                  $("#add_btn").css("display","");
+                }
+              }
+              function send_img()
+              {
+                localIds = "";
+                serverId = "";
+                wx.chooseImage({
+            		     count: 1, // 默认9
+            		    // sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            		    // sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            		    success: function (res) {
+              		    localIds = res.localIds[0]; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                      wx.uploadImage({
+                          localId: localIds, // 需要上传的图片的本地ID，由chooseImage接口获得
+                          isShowProgressTips: 1, // 默认为1，显示var src = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token={$access_token}&media_id="+serverId;
+                            //   // var msg = "<img src='"+src+"' onclick='viewImage('"+src+"')'/>";
+                            //   var msg = "<img src='"+src+"' onclick=\"viewImage('"+src+"')\"/>";
+                            //   sendMsg(msg);进度提示
+                          success: function (res) {
+                              serverId = res.serverId; // 返回图片的服务器端ID
+                              saveImage(serverId);
+
+                              // var msg = "<img serverId='"+serverId+"' src='"+localIds+"'/>";
+                            //   var src = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token={$access_token}&media_id="+serverId;
+                            //   // var msg = "<img src='"+src+"' onclick='viewImage('"+src+"')'/>";
+                            //   var msg = "<img src='"+src+"' onclick=\"viewImage('"+src+"')\"/>";
+                            //   sendMsg(msg);
+                          }
+                      });
+              		  }
+            		});
+              }
+
+              function saveImage(media_id) {
+                  var href = "{php echo $this->createMobileUrl('saveImage');}";
+                  $.post(href, {
+                      media_id: media_id
+                  }, function(data) {
+                      console.log(data);
+                      var msg = "<img src='"+data+"' onclick=\"viewImage('"+data+"')\"/>";
+                      sendMsg(msg);
+                  });
+              }
+
+              function viewImage(src)
+              {
+                wx.previewImage({
+                    current: src, // 当前显示图片的http链接
+                    urls: [src] // 需要预览的图片http链接列表
+                });
+              }
+
+              $().ready(function(){
+                wx.config({
+            		    debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            		    appId: 'wxee3496c4bd4556c0', // 必填，公众号的唯一标识
+            		    timestamp: '{$timestamp}', // 必填，生成签名的时间戳
+            		    nonceStr: '{$noncestr}', // 必填，生成签名的随机串
+            		    signature: '{$signature}',// 必填，签名，见附录1
+            		    jsApiList: [
+            				'chooseImage',
+            				'previewImage',
+            				'uploadImage'
+            			] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+            		});
+              });
+            </script>
             <div id="temp" style="display:none;">
                 <li>
-                    <img src="{if substr($mem_info['avatar'],0,4) != 'http'}../attachment/{/if}{$mem_info['avatar']}" class="right ml-10" id="title" />
+                    <img onclick="location.href='{php echo $this->createMobileUrl(upload);}'" src="{if substr($mem_info['avatar'],0,4) != 'http'}../attachment/{/if}{$mem_info['avatar']}" class="right ml-10" id="title" />
                     <span class="right">我是聊天内容</span>
                 </li>
             </div>
             <div id="temp1" style="display:none;">
                 <li>
-                    <img src="{if substr($doctor_info['avatar'],0,4) != 'http'}../attachment/{/if}{$doctor_info['avatar']}" class="left mr-10" id="title" />
+                    <img onclick="location.href='{php echo $this->createMobileUrl(Doctor3View,array('doctor_id' => $doctor_info['uid']));}'" src="{if substr($doctor_info['avatar'],0,4) != 'http'}../attachment/{/if}{$doctor_info['avatar']}" class="left mr-10" id="title" />
                     <span class="left">我是聊天内容</span>
                 </li>
             </div>
@@ -414,7 +501,7 @@
                     var text = $(".Input_text").val();
                     $(".Input_text").val("");
                     reg = new RegExp('\\[(.+?)\\]', "g");
-                    text = text.replace(reg, "<img src='../addons/water_baby/template/face/$1.gif' width='24' height='24' />");
+                    text = text.replace(reg, "<img id='emo' src='../addons/water_baby/template/face/$1.gif' width='24' height='24' />");
                     // $("#temp li .right").html(text);
                     // $(".mylist").append($("#temp").html());
                     sendMsg(text);
@@ -443,7 +530,7 @@
                 }
             }
         }
-		
+
     </script>
     <script type="text/javascript">
         // 初始化
@@ -514,6 +601,20 @@
                 // console.log("NEW MESSAGE");
                 if (String(text).replace(/^\s+/, '').replace(/\s+$/, '')) {
                     $("#temp1 li .left").html(text);
+                    $("#temp1 li .left img").each(function(i,val){
+                      if($(this).attr("serverId"))
+                      {
+                        var serverId = $(this).attr("serverId");
+                        wx.downloadImage({
+                            serverId: serverId, // 需要下载的图片的服务器端ID，由uploadImage接口获得
+                            isShowProgressTips: 1, // 默认为1，显示进度提示
+                            success: function (res) {
+                                var localId = res.localId; // 返回图片下载后的本地ID
+                                $(this).attr("src",localId);
+                            }
+                        });
+                      }
+                    });
                     if (isBefore) {
                         //$(".mylist").insertBefore($("#temp1").html(),document.getElementById("mylist").childNodes[0]);
                         var temp = $(".mylist").html();
@@ -524,12 +625,26 @@
                     }
 					//定义下拉刷新
 					myslide();
-					
+
                 }
             } else {
                 if (String(text).replace(/^\s+/, '').replace(/\s+$/, '')) {
                     //showLog('（' + formatTime(message.timestamp) + '）  ' + encodeHTML(from) + '： ', encodeHTML(message.text), isBefore);
                     $("#temp li .right").html(text);
+                    $("#temp li .left img").each(function(i,val){
+                      if($(this).attr("serverId"))
+                      {
+                        var serverId = $(this).attr("serverId");
+                        wx.downloadImage({
+                            serverId: serverId, // 需要下载的图片的服务器端ID，由uploadImage接口获得
+                            isShowProgressTips: 1, // 默认为1，显示进度提示
+                            success: function (res) {
+                                var localId = res.localId; // 返回图片下载后的本地ID
+                                $(this).attr("src",localId);
+                            }
+                        });
+                      }
+                    });
                     if (isBefore) {
                         //$(".mylist").insertBefore($("#temp1").html(),document.getElementById("mylist").childNodes[0]);
                         var temp = $(".mylist").html();
@@ -549,11 +664,16 @@
         function sendMsg(text) {
 
             var val = text;
-			
-            // 不让发送空字符
-            if (!String(val).replace(/^\s+/, '').replace(/\s+$/, '')) {
-                alert('请输入点文字！');
+
+            // // 不让发送空字符
+            if($("#send_btn").css("display")!="none")
+            {
+              if (!String(val).replace(/^\s+/, '').replace(/\s+$/, '')) {
+                  alert('请输入点文字！');
+              }
             }
+            $("#send_btn").css("display","none");
+            $("#add_btn").css("display","");
 
             ref.push({
                 from: clientId,
@@ -651,10 +771,10 @@
         // presenceRef.onDisconnect().set('disconnected');
         presenceRef.onDisconnect().update({
             "status": "disconnected"
-        });	
+        });
     </script>
     <script>
-	var isfirst = ture;
+	var isfirst = true;
 	function myslide()
 	{
 		if(isfirst)
@@ -690,7 +810,7 @@
         {loop $chat_list $item}
             getLog({$item['room_id']});
         {/loop}
-		
+
     });*/
 	</script>
 </body>

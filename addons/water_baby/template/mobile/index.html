@@ -16,7 +16,7 @@
             	<div class="swipe" id="slider">
                 	<div class='swipe-wrap' id="banner-content">
                         {loop $banner_list $item}
-                        <a href="#">
+                        <a href="{$item['url']}">
                             <img src="../attachment/{$item['img']}"/>
                         </a>
                         {/loop}

@@ -15,7 +15,7 @@
 </head>
 <body>
 	<div class="top">
-		<a href="{php echo $this->createMobileUrl('my')}" class="weui_media_appmsg">
+		<a href="{if !empty($_GPC['user_id'])}#{else}{php echo $this->createMobileUrl('my')}{/if}" class="weui_media_appmsg">
 	    	<div class="logo">
 	        	<img src="{if empty($mem_info['avatar'])}../addons/water_baby/template/img/icons/user_placehold.png{else}{if substr($mem_info['avatar'],0,4) != 'http'}../attachment/{/if}{$mem_info['avatar']}{/if}"/>
 	        </div>
@@ -24,6 +24,7 @@
 	        </div>
 		</a>
     </div>
+	{if empty($_GPC['user_id'])}
     <a href="{php echo $this->createMobileUrl('doupload')}" class="weui_media_box weui_media_appmsg">
         <div class="weui_media_hd"></div>
         <div class="weui_media_hd" id="weui_media_hd">
@@ -31,6 +32,9 @@
         </div>
         <div class="weui_media_bd"></div>
     </a>
+	{else}
+		<br/><br/><br/>
+	{/if}
 	{loop $moment_list $item}
     <a href="{php echo $this->createMobileUrl('ShowMomDetail',array('moment_id' => $item['id']));}" class="weui_media_box weui_media_appmsg">
         <div class="weui_media_hd" style="line-height:1em;">

@@ -32,6 +32,7 @@
 						<th style="width: 180px;">文章标题</th>
 						<th style="width: 80px;">发布时间</th>
 						<th style="width: 40px;">置顶</th>
+						<th style="width: 40px;">推荐</th>
 						<!-- <th style="width: 60px;">发布者</th> -->
 						<th style="width: 70px; text-align: right;">操作</th>
 					</tr>
@@ -44,6 +45,7 @@
 						<td>{$item['title']}</td>
 						<td>{$item['addtime']}</td>
 						<td>{if $item['indexno'] == '2'}置顶{/if}</td>
+						<td>{if $item['status'] == '2'}推荐{/if}</td>
 						<!-- <td>{$item['nickname']}</td> -->
 						<td style="text-align: right;">
 							<a class="btn btn-success btn-sm"
