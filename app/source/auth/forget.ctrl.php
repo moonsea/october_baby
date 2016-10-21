@@ -4,12 +4,16 @@
  * WeEngine is NOT a free software, it under the license terms, visited http://www.we7.cc/ for more details.
  */
 defined('IN_IA') or exit('Access Denied');
+include_once 'aliyun-php-sdk-core/Config.php';
+use Sms\Request\V20160927 as Sms;
 
 $openid = $_W['openid'];
 $dos = array('reset', 'forget', 'verifycode');
 $setting = uni_setting($_W['uniacid'], array('uc'));
 $uc_setting = $setting['uc'] ? $setting['uc'] : array();
-$forward = url('mc');
+// $forward = url('mc');
+$forward = url('entry', array('do' => 'my','m' => 'water_baby'));
+
 if(!empty($_GPC['forward'])) {
 	$forward = './index.php?' . base64_decode($_GPC['forward']) . '#wechat_redirect';
 }

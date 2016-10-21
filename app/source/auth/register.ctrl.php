@@ -37,6 +37,7 @@ if($do == 'register') {
 		$code = trim($_GPC['code']);
 		$username = trim($_GPC['username']);
 		$password = trim($_GPC['password']);
+		$verifycode = trim($_GPC['verifycode']);
 		if (empty($code)) {
 			$repassword = trim($_GPC['repassword']);
 			if ($repassword != $password) {
@@ -73,7 +74,7 @@ if($do == 'register') {
 			}
 		} else {
 			load()->model('utility');
-			if (!code_verify($_W['uniacid'], $username, $password)) {
+			if (!code_verify($_W['uniacid'], $username, $verifycode)) {
 				message('验证码错误', referer(), 'error');
 			} else {
 				pdo_delete('uni_verifycode', array('receiver' => $username));

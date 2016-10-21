@@ -49,6 +49,7 @@
 			var params = {};
 			params.receiver = username;
 			params.uniacid = uniacid;
+			params.verifytype = 'regist';
 			$.post('../web/index.php?c=utility&a=verifycode', params).success(function(dat){
 				if(dat == 'success') {
 					util.toast('发送验证码成功');
@@ -64,20 +65,39 @@
 		});
 		$(document).on('click', '.js-code', function() {
 			var username = $('#register-code input[name="username"]').val();
+			var verifycode = $('#register-code input[name="verifycode"]').val();
 			var password = $('#register-code input[name="password"]').val();
+			var repassword = $('#register-code input[name="repassword"]').val();
+
 			if(!username) {
 				util.toast('请输入手机号', '', 'error');
 				return;
 			}
-			if(!password) {
+			if(!verifycode) {
 				util.toast('请输入验证码', '', 'error');
 				return;
 			}
+
+			if (!password || !repassword) {
+				util.toast('用户名或密码为空', '', 'error');
+				return;
+			}
+			if(password.length < 6) {
+				util.toast('密码不能小于六位数', '', 'error');
+				return;
+			}
+			if (password !== repassword) {
+				util.toast('两次密码输入不一致', '', 'error');
+				return;
+			}
+
 			var href = "{php echo url('auth/register', array('code' => '1'))}";
-			$.post(href, {'username' : username, 'password' : password}, function(data) {
+			$.post(href, {'username' : username, 'password' : password, 'verifycode' : verifycode}, function(data) {
 				data = $.parseJSON(data);
 				if (data.type == 'success') {
-					location.reload();
+					// location.reload();
+					location.href = "{php echo url('entry', array('do' => 'RegistType','m' => 'water_baby'));}";
+
 				} else {
 					util.toast(data.message);
 				}
@@ -125,7 +145,46 @@
 		<div class="avatar mui-text-center">
 			<img src="{$headimgurl}" class="mui-img-circle"/>
 		</div>
-		<div class="mui-input-group" id="register-basic">
+		<div class="mc-login-code" id="register-code">
+			<div class="sendcode">
+				<div class="mui-content-padded mui-text-muted">请输入手机号,以收取验证码</div>
+				<div class="mui-input-group mui-mt15">
+					<div class="mui-input-row">
+						<label class="mui-label-icon"><i class="fa fa-user"></i></label>
+						<input name="username" type="text" class="js-mobile-val" placeholder="手机号"/>
+					</div>
+				</div>
+				<div class="mui-content-padded mui-text-center">
+					<button class="mui-btn mui-btn-success mui-btn-block js-check-mobile" uniacid="{$_W['uniacid']}">下一步</button>
+				</div>
+			</div>
+			<div style="display:none;" class="codeverify">
+				<div class="mui-content-padded mui-text-muted">您的手机号<span class="mui-text-success"></span>会收到一条含有6位数字验证码的短息</div>
+				<div class="mui-input-group mui-mt15">
+					<div class="mui-input-row">
+						<label class="mui-label-icon"><i class="fa fa-key"></i></label>
+						<input name="verifycode" type="text" placeholder="验证码"/>
+					</div>
+					<div class="mui-input-row">
+						<label class="mui-label-icon"><i class="fa fa-lock"></i></label>
+						<input name="password" type="password" placeholder="密码" class="mui-input-password"/>
+					</div>
+					<div class="mui-input-row">
+						<label class="mui-label-icon"><i class="fa fa-lock"></i></label>
+						<input name="repassword" type="password" placeholder="确认密码" class="mui-input-password"/>
+					</div>
+				</div>
+				<div class="mui-content-padded mui-text-center">
+					<button class="mui-btn mui-btn-success mui-btn-block js-code" type="submit">注册</button>
+					<div class="mui-mt15 mui-text-center">
+						<span class="mui-text-muted js-timer">
+
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <div class="mui-input-group" id="register-basic">
 			<div class="mui-input-row">
 				<label class="mui-label-icon"><i class="fa fa-user"></i></label>
 				<input name="username" type="text" placeholder="{if $item == 'random'}请填写手机号/邮箱{elseif $item == 'email'}请填写邮箱{else}请填写手机号{/if}"/>
@@ -142,7 +201,7 @@
 		<div class="mui-content-padded">
 			<button class="mui-btn mui-btn-success mui-btn-block register-basic" type="submit">注册</button>
             <input type="hidden" name="openid" value="{$openid}"/>
-		</div>
+		</div> -->
 	{/if}
 	{/if}
 	{if $rtype == 'mobile' || ($item == 'mobile' && $ltype == 'code')}
