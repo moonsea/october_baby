@@ -4,8 +4,6 @@
  * WeEngine is NOT a free software, it under the license terms, visited http://www.we7.cc/ for more details.
  */
 defined('IN_IA') or exit('Access Denied');
-include_once 'aliyun-php-sdk-core/Config.php';
-use Sms\Request\V20160927 as Sms;
 
 $openid = $_W['openid'];
 $dos = array('reset', 'forget', 'verifycode');

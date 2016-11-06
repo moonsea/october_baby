@@ -121,14 +121,6 @@
     <script src="../addons/water_baby/template/js/idangerous.swiper.min.js" type="text/javascript"></script>
     <script src="../addons/water_baby/template/js/functions.js" type="text/javascript"></script>
     <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
-    <!-- 引入 LeanCloud 存储 SDK -->
-    <!-- <script src="../addons/water_baby/template/js/av-min-1.0.0.js"></script> -->
-    <!-- 引入 LeanCloud 实时通信 SDK -->
-    <!-- <script src="../addons/water_baby/template/js/realtime.browser.min.js"></script> -->
-    <!-- 引入 LeanCloud 实时通讯 TypedMessages -->
-    <!-- <script src="../addons/water_baby/template/js/typed-messages.min.js"></script> -->
-    <!-- Demo 逻辑文件 -->
-    <!-- <script src="../addons/water_baby/template/js/chat.js"></script> -->
     <script src="https://cdn.wilddog.com/sdk/js/2.0.0/wilddog.js"></script>
 </head>
 
@@ -181,34 +173,18 @@
               		    localIds = res.localIds[0]; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
                       wx.uploadImage({
                           localId: localIds, // 需要上传的图片的本地ID，由chooseImage接口获得
-                          isShowProgressTips: 1, // 默认为1，显示var src = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token={$access_token}&media_id="+serverId;
-                            //   // var msg = "<img src='"+src+"' onclick='viewImage('"+src+"')'/>";
-                            //   var msg = "<img src='"+src+"' onclick=\"viewImage('"+src+"')\"/>";
-                            //   sendMsg(msg);进度提示
+                          isShowProgressTips: 1, // 默认为1，显示进度提示
                           success: function (res) {
                               serverId = res.serverId; // 返回图片的服务器端ID
-                              saveImage(serverId);
-
                               // var msg = "<img serverId='"+serverId+"' src='"+localIds+"'/>";
-                            //   var src = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token={$access_token}&media_id="+serverId;
-                            //   // var msg = "<img src='"+src+"' onclick='viewImage('"+src+"')'/>";
-                            //   var msg = "<img src='"+src+"' onclick=\"viewImage('"+src+"')\"/>";
-                            //   sendMsg(msg);
+                              var src = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token={$access_token}&media_id="+serverId;
+                              // var msg = "<img src='"+src+"' onclick='viewImage('"+src+"')'/>";
+                              var msg = "<img src='"+src+"' onclick=\"viewImage('"+src+"')\"/>";
+                              sendMsg(msg);
                           }
                       });
               		  }
             		});
-              }
-
-              function saveImage(media_id) {
-                  var href = "{php echo $this->createMobileUrl('saveImage');}";
-                  $.post(href, {
-                      media_id: media_id
-                  }, function(data) {
-                      console.log(data);
-                      var msg = "<img src='"+data+"' onclick=\"viewImage('"+data+"')\"/>";
-                      sendMsg(msg);
-                  });
               }
 
               function viewImage(src)
@@ -236,13 +212,13 @@
             </script>
             <div id="temp" style="display:none;">
                 <li>
-                    <img onclick="location.href='{php echo $this->createMobileUrl(upload);}'" src="{if substr($mem_info['avatar'],0,4) != 'http'}../attachment/{/if}{$mem_info['avatar']}" class="right ml-10" id="title" />
+                    <img src="{if substr($mem_info['avatar'],0,4) != 'http'}../attachment/{/if}{$mem_info['avatar']}" class="right ml-10" id="title" />
                     <span class="right">我是聊天内容</span>
                 </li>
             </div>
             <div id="temp1" style="display:none;">
                 <li>
-                    <img onclick="location.href='{php echo $this->createMobileUrl(Doctor3View,array('doctor_id' => $doctor_info['uid']));}'" src="{if substr($doctor_info['avatar'],0,4) != 'http'}../attachment/{/if}{$doctor_info['avatar']}" class="left mr-10" id="title" />
+                    <img onclick="location.href='{php echo $this->createMobileUrl(doctor3view,array('doctor_id' => $doctor_id));}'"  src="{if substr($doctor_info['avatar'],0,4) != 'http'}../attachment/{/if}{$doctor_info['avatar']}" class="left mr-10" id="title" />
                     <span class="left">我是聊天内容</span>
                 </li>
             </div>
@@ -665,15 +641,14 @@
 
             var val = text;
 
-
-            // 不让发送空字符
-            if($("#send_btn").css("display")!="none")
-            {
+            // // 不让发送空字符
+            // if($("#send_btn").css("display")!="none")
+            // {
               if (!String(val).replace(/^\s+/, '').replace(/\s+$/, '')) {
-                  alert('请输入点文字！');
+                  // alert('请输入点文字！');
+                  return;
               }
-            }
-
+            // }
             $("#send_btn").css("display","none");
             $("#add_btn").css("display","");
 
@@ -693,6 +668,14 @@
 
                 if (doctorStatus == null || doctorStatus == 'disconnected') {
                     // var con = text;
+                    if(text.indexOf('img')!=-1 && text.indexOf('shiyue.october-baby.com/baby/attachment/images')!=-1)
+                    {
+                        text = "图片信息";
+                    }
+                    if(text.indexOf('<img')!=-1 && text.indexOf('../addons/water_baby/template/face/')!=-1)
+                    {
+                        text = "表情信息";
+                    }
                     var href = "{php echo $this->createMobileUrl('sendWechatMsg');}";
                     $.post(href, {
                         openid: '{$doctor_info['openid']}',

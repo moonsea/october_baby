@@ -4,10 +4,13 @@
  * WeEngine is NOT a free software, it under the license terms, visited http://www.we7.cc/ for more details.
  */
 defined('IN_IA') or exit('Access Denied');
+// if (empty($_W['openid'])) {
+// 	__construct();
+// }
+$title = '十月宝宝';
 $openid = $_W['openid'];
 $dos = array('register', 'uc');
 $do = in_array($do, $dos) ? $do : 'register';
-
 $setting = uni_setting($_W['uniacid'], array('uc', 'passport'));
 $uc_setting = $setting['uc'] ? $setting['uc'] : array();
 $item = $setting['passport']['item'] ? $setting['passport']['item'] : 'mobile';
@@ -25,7 +28,7 @@ if(!empty($_W['member']) && (!empty($_W['member']['mobile']) || !empty($_W['memb
 }
 if($do == 'register') {
 	$accObj = WeixinAccount::create($id);
-    $access_token = $accObj->fetch_token();
+  $access_token = $accObj->fetch_token();
 	$user_datas = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/user/info?access_token=$access_token&openid=$openid&lang=zh_CN"));
 	$username = $user_datas->nickname;
 	$headimgurl = $user_datas->headimgurl;
@@ -140,4 +143,24 @@ if($do == 'register') {
 	}
 	template('auth/register');
 	exit;
+}
+
+function __construct()
+{
+	global $_W, $_GPC;
+	if (empty($_W['openid'])) {
+		if (empty($_SESSION['openid'])) {
+			// $tmp = pdo_get();
+			if ($_GPC['wgateid']) {
+				$_W['openid'] = $_SESSION['openid'] = $_GPC['wgateid'];
+			} else {
+				$thisUrl = urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+				$gateUrl = "http://www.weixingate.com/gate.php?back=$thisUrl&force=1&info=none";
+				header('Location: ' . $gateUrl);
+				exit;
+			}
+		} else {
+			$_W['openid'] = $_SESSION['openid'];
+		}
+	}
 }

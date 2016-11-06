@@ -25,7 +25,7 @@ if($do == 'login_out') {
 	// message($_COOKIE,'','error');
 	// exit();
 	// session_destroy();
-	isetcookie('logout', 1, 315360000);
+	isetcookie('logout', 1, -315360000);
 	$logoutjs = "<script language=\"javascript\" type=\"text/javascript\">window.location.href=\"" . url('entry',array('do'=>'my','m'=>'water_baby')) . "\";</script>";
 	exit($logoutjs);
 

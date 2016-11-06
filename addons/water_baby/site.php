@@ -14,7 +14,6 @@ class water_babyModuleSite extends WeModuleSite
     /**
      * 粉丝表.
      *
-     * @var unknown
      */
     public $fanstable = 'water_obaby_fans';
 
@@ -62,7 +61,7 @@ class water_babyModuleSite extends WeModuleSite
 
         /* 今日推荐文章列表 limit 4 */
         $tjsql = 'SELECT * FROM '.tablename($this->articletable)."
-		WHERE uniacid = '{$_W['uniacid']}' and status = 2 and state = '$state' ORDER BY addtime LIMIT 4";
+		WHERE uniacid = '{$_W['uniacid']}' and status = 2 and state = '$state' ORDER BY addtime desc LIMIT 4";
         $tjlist = pdo_fetchall($tjsql);
 
         $articletypesql = 'SELECT * FROM '.tablename($this->articletypetable)." WHERE uniacid = '{$_W['uniacid']}' and state = '$state'  ORDER BY indexno ";
@@ -89,7 +88,8 @@ class water_babyModuleSite extends WeModuleSite
     		}
         $noncestr = 'Wm3WZYTPz0wzccnW';
         $timestamp = time();
-        $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=index&m=water_baby';
+        // $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=index&m=water_baby';
+        $url = 'http://shiyue.october-baby.com/baby/app/index.php?'.$_SERVER['QUERY_STRING'];
         $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
         $signature = sha1($string);
 
@@ -158,6 +158,26 @@ class water_babyModuleSite extends WeModuleSite
                 break;
             }
         }
+
+        $access_token = $this->getToken();
+        if($_COOKIE['jsapi_ticket'])
+    		{
+    			$jsapi_ticket = $_COOKIE['jsapi_ticket'];
+    		}
+    		else
+    		{
+    			$tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
+    			$jsapi_ticket = $tmp->ticket;
+    			setcookie('jsapi_ticket',$jsapi_ticket,7000);
+    			$_COOKIE['jsapi_ticket'] == $jsapi_ticket;
+    		}
+        $noncestr = 'Wm3WZYTPz0wzccnW';
+        $timestamp = time();
+        // $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=index&m=water_baby';
+        $url = 'http://shiyue.october-baby.com/baby/app/index.php?'.$_SERVER['QUERY_STRING'];
+        $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
+        $signature = sha1($string);
+
 
         include $this->template('article');
     }
@@ -293,7 +313,8 @@ class water_babyModuleSite extends WeModuleSite
     		}
         $noncestr = 'Wm3WZYTPz0wzccnW';
         $timestamp = time();
-        $url = "http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&type=".$_GET['type']."&doctor_id=".$_GET['doctor_id']."&room_id=".$_GET['room_id']."&do=chat&m=water_baby";
+        // $url = "http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&type=".$_GET['type']."&doctor_id=".$_GET['doctor_id']."&room_id=".$_GET['room_id']."&do=chat&m=water_baby";
+        $url = "http://shiyue.october-baby.com/baby/app/index.php?".$_SERVER['QUERY_STRING'];
         $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
         $signature = sha1($string);
         include $this->template('chat');
@@ -397,7 +418,8 @@ class water_babyModuleSite extends WeModuleSite
     		}
         $noncestr = 'Wm3WZYTPz0wzccnW';
         $timestamp = time();
-        $url = "http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&conv_id=".$_GET['conv_id']."&type=".$_GET['type']."&do=DoctorChat&m=water_baby";
+        // $url = "http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&conv_id=".$_GET['conv_id']."&type=".$_GET['type']."&do=DoctorChat&m=water_baby";
+        $url = "http://shiyue.october-baby.com/baby/app/index.php?".$_SERVER['QUERY_STRING'];
         $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
         $signature = sha1($string);
 
@@ -1672,16 +1694,188 @@ class water_babyModuleSite extends WeModuleSite
 
         $mem_doctor = $this->getMemInfo($doctor_id);
 
+        /* 当期周几 */
+        // $cur_time = time();
+        // $cur_week = date('w', $cur_time);
+        // switch($cur_week){
+        //     case 1:
+        //         return "星期一";
+        //         break;
+        //     case 2:
+        //         return "星期二";
+        //         break;
+        //     case 3:
+        //         return "星期三";
+        //         break;
+        //     case 4:
+        //         return "星期四";
+        //         break;
+        //     case 5:
+        //         return "星期五";
+        //         break;
+        //     case 6:
+        //         return "星期六";
+        //         break;
+        //     case 0:
+        //         return "星期日";
+        //         break;
+        // }
+
+        $last_monday = strtotime("-2 monday");
+        $next_sunday = strtotime("+3 monday") - 1;
+
+        /* 获取医生值班列表 */
+        $sql = "SELECT * FROM ".tablename('water_baby_work_day')." WHERE user_id = '$doctor_id'";
+        $sql .= " and worktime between '".$last_monday."' and '".$next_sunday."'";
+        $work_list = pdo_fetchall($sql);
+
+        $work_data = $this->getWorkData($work_list, $last_monday, $next_sunday);
+
+        $item = [0,1,2,3,4,5,6];
+        $item2 = [7,8,9,10,11,12,13];
+        $item3 = [14,15,16,17,18,19,20];
+        $item4 = [21,22,23,24,25,26,27];
+        $week = ['星期一','星期二','星期三','星期四','星期五','星期六','星期天','星期一','星期二','星期三','星期四','星期五','星期六','星期天','星期一','星期二','星期三','星期四','星期五','星期六','星期天','星期一','星期二','星期三','星期四','星期五','星期六','星期天'];
+
         include $this->template('doctor3view');
     }
 
+    /**
+     * 构造显示数据
+     * @param  [type] $work_list   [description]
+     * @param  [type] $last_monday [description]
+     * @param  [type] $next_sunday [description]
+     * @return [type]              [description]
+     */
+    public function getWorkData($work_list, $last_monday, $next_sunday)
+    {
+        $work_data = array();
+
+        for ($i=1; $i < 29; $i++) {
+            $temp_data = array("date"=>'',worktype=>'',daytype=>'');
+            $time = $last_monday + $i * 86400 - 1;
+            $day = date('m-d', $time);
+            $temp_data['date'] = $day;
+            $temp_data['worktype'] = '0';
+            $temp_data['daytype'] = '1';
+            foreach ($work_list as $item) {
+                if (date('m-d', $item['worktime']) == $day) {
+                    $temp_data['worktype'] = $item['worktype'];
+                    $temp_data['daytype'] = $item['daytype'];
+                }
+            }
+            $work_data[] = $temp_data;
+        }
+
+        return $work_data;
+    }
+
+    /**
+     * 更新医生工作时间
+     * @return [type] [description]
+     */
+    public function doMobileUpdateWorkDay()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $date = $_GPC['date'];
+        if (empty($date)) {
+            message('日期不能为空','','error');
+            exit();
+        }
+        $worktime = strtotime($date);
+        $daytype = empty($_GPC['daytype'])? '1':$_GPC['daytype'];
+        $worktype = empty($_GPC['type'])? '0':$_GPC['worktype'];
+
+        $user_id = $_W['member']['uid'];
+
+        $row = pdo_get('water_baby_work_day', array('user_id' => $user_id, 'worktime' => $worktime));
+
+        if (empty($row)) {
+            pdo_insert('water_baby_work_day', array('user_id' => $user_id, 'worktime' => $worktime, 'addtime' => time(), 'worktype' => $worktype, 'daytype' => $daytype));
+        }
+        else {
+            if ($row['daytype'] == $daytype) {
+                pdo_update('water_baby_work_day', array('worktype' => $worktype), array('id' => $row['id']));
+            }
+            else {
+                pdo_update('water_baby_work_day', array('worktype' => $worktype, 'daytype' => '3'), array('id' => $row['id']));
+            }
+        }
+
+        message('更新成功',referer(),'success');
+    }
+
+    /**
+     * 体重曲线
+     * @return [type] [description]
+     */
     public function doMobileViewWeight()
     {
         global $_W,$_GPC;
 
         checkauth();
 
+        $user_id = $_W['member']['uid'];
+
+        /* 用户体重列表 */
+        $sql = "SELECT * FROM ".tablename('water_baby_weight')." WHERE user_id = '$user_id' order by addtime desc limit 14";
+        $weight_list = pdo_fetchall($sql);
+
+        $weight_list = array_reverse($weight_list);
+
+        //var_dump($weight_list);
+
+        $labels = "";
+        $weight = "";
+
+        foreach ($weight_list as $item) {
+            $labels = $labels.",'".date('Y-m-d',$item['addtime'])."'";
+            $weight = $weight.",".$item['weight'];
+        }
+
+        $labels = substr($labels, 1);
+        $weight = substr($weight, 1);
+
+        // var_dump($labels);
+
         include $this->template('view_weight');
+    }
+
+    /**
+     * 更新体重
+     * @return [type] [description]
+     */
+    public function doMobileWeightUpdate()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $user_id = $_W['member']['uid'];
+        $weight = $_GPC['weight'];
+
+        /* 校验更新时间 */
+        $sql = "SELECT addtime FROM ".tablename('water_baby_weight')." WHERE user_id = '$user_id' ORDER BY addtime DESC LIMIT 1";
+        $last = pdo_fetch($sql);
+
+        // $last_day = date()
+        if ((date('Y-m-d',time())) == (date('Y-m-d',$last['addtime']))) {
+            message('每天只能上传一次呦！','','error');
+        }
+
+        // if ((time() - $last['addtime']) < 86400) {
+        //     message('每天只能上传一次呦！','','error');
+        // }
+
+        $result = pdo_insert('water_baby_weight', array('weight' => $weight, 'user_id' => $user_id, 'addtime' => time()));
+
+        if (!empty($result)) {
+            message('更新成功',referer(),'success');
+        }
+        message('更新失败',referer(),'error');
     }
 
 
