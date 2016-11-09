@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>医师资格认证</title>
+    <style type="text/css">
+        .book{
+            width: 100%;
+            height: 42px;
+            line-height: 42px;
+            color: #fff; font-size: 16px; text-align: center;
+            background: #56abe4; display: block;
+            text-decoration: none; border-radius: 999px;
+        }
+        .book1{
+            width: 100%;
+            height: 42px;
+            line-height: 42px;
+            color: #fff; font-size: 16px; text-align: center;
+            background: #50d2c2; display: block;
+            text-decoration: none; border-radius: 999px;
+        }
+        input[type='text'],input[type='button'],input[type='submit']{
+            appearance:none;
+        }
+        .input{
+            width: 100%;
+            height: 40px; line-height: 40px;
+            text-indent: 1em; color: #333;
+            border: 0; outline: none;
+            margin: 0; padding: 0;
+        }
+    </style>
+</head>
+
+<body style="background:#fff; padding: 8px; ">
+<center><h3>医师资格认证</h3></center>
+<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td  align="left" valign="middle" height="50" width="20%">姓名</td>
+        <td  align="left" valign="middle" height="50" width="80%">
+            <input type="text" name="name" placeholder="姓名" class="input" id="name">
+        </td>
+    </tr>
+    <tr>
+        <td  align="left" valign="middle" height="50" width="20%">年龄</td>
+        <td  align="left" valign="middle" height="50" width="80%">
+            <input type="text" name="name" placeholder="年龄" class="input" id="age">
+        </td>
+    </tr>
+    <tr>
+        <td  align="left" valign="middle" height="50" width="20%">身份证号</td>
+        <td  align="left" valign="middle" height="50" width="80%">
+            <input type="text" name="name" placeholder="身份证号" class="input" id="id">
+        </td>
+    </tr>
+</table>
+<br><br><br>
+<img src="" alt="" id="photo" style="display:none; width:100%; height:auto; min-height:80px;"/>
+<a href="javascript:void(0)" onclick="chooseImage()" class="book1" id="upload">
+    上传照片
+</a>
+<br>
+<a href="javascript:void(0)" class="book" id="verify">
+    提交认证
+</a>
+<p style="text-align:center;">
+    拍照要求：的还是供货商的发给你
+</p>
+<script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $().ready(function(e){
+        wx.config({
+            debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: 'wxee3496c4bd4556c0', // 必填，公众号的唯一标识
+            timestamp: '{$timestamp}', // 必填，生成签名的时间戳
+            nonceStr: '{$noncestr}', // 必填，生成签名的随机串
+            signature: '{$signature}',// 必填，签名，见附录1
+            jsApiList: [
+               'chooseImage',
+                'previewImage',
+                'uploadImage'
+            ] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+        });
+    });
+</script>
+<script type="text/javascript">
+    function chooseImage()
+    {
+        wx.chooseImage({
+                count: 1, // 默认9
+                // sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: ['camera'], // 可以指定来源是相册还是相机，默认二者都有
+                success: function (res) {
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    var path = localIds[0];
+                    $("#upload").hide();
+                    $("#photo").attr("src",path);
+                    $("#photo").fadeIn(200);
+                    wx.uploadImage({
+        				localId: path, // 需要上传的图片的本地ID，由chooseImage接口获得
+        				isShowProgressTips: 1, // 默认为1，显示进度提示
+        				success: function (res) {
+        					serverId = res.serverId; // 返回图片的服务器端ID
+                            $("#photo").attr("data-serverId",serverId);
+                            $("#verify").attr("onclick","verify()");
+        				}
+        			});
+                }
+            });
+    }
+
+    function verify()
+    {
+        var name = $("#name").val();
+        var age = $("#age").val();
+        var ID = $("#id").val();
+        var serverId = $("#photo").attr("data-serverId");
+        if(name.length < 2)
+        {
+            alert("用户名不符合规范");
+            return;
+        }
+        if(age.length < 2 || age.length > 2)
+        {
+            alert("年龄不符合规范");
+            return;
+        }
+        if(ID.length < 16)
+        {
+            alert("身份证号码不符合规范");
+            return;
+        }
+        if(serverId.length < 5)
+        {
+            alert("请上传照片");
+            return;
+        }
+
+        var href = "{php echo $this->createMobileUrl('DoVerify');}";
+        $.post(href, {'username' : name, 'age' : age, 'card_num' : ID, 'media_id' : serverId}, function(data) {
+            console.log(data);
+            data = $.parseJSON(data);
+            if (data.type == 'success') {
+                location.href = data.redirect;
+            } else {
+                alert(data.message);
+            }
+        })
+
+    }
+
+</script>
+</body>
+</html>

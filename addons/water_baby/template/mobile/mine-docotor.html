@@ -63,6 +63,37 @@ span#wrap{
                         	<a href="{php echo $this->createMobileUrl('DoctorStep3');}">点击更改</a>
                         </span>
                     </div>
+                    <div class="h1"></div>
+                    <!--  NEW ADD START   -->
+                     <div class="item">
+                        <img src="../addons/water_baby/template/img/icons/list/11.png" alt="" class="item_ico">
+                        <span id="wrap">认证</span>
+                        <img src="../addons/water_baby/template/img/icons/arrow.png" alt="" class="item_arrow">
+                        <span class="fr hint">
+                            {if $mem_info['ver_sta'] == '1'}正在认证{elseif $mem_info['ver_sta'] == '2'}认证通过{else}<a href="{php echo $this->createMobileUrl('Verify');}">{if $mem_info['ver_sta'] == '3'}重新{else}点击{/if}认证</a>{/if}
+                        </span>
+                    </div>
+                    <div class="h1"></div>
+                    <div class="item">
+                        <img src="../addons/water_baby/template/img/icons/list/11.png" alt="" class="item_ico">
+                        <span id="wrap">排班表</span>
+                        <img src="../addons/water_baby/template/img/icons/arrow.png" alt="" class="item_arrow">
+                        <span class="fr hint">
+                            <a href="{php echo $this->createMobileUrl('Work');}">点击更改</a>
+                        </span>
+                    </div>
+                    <div class="h1"></div>
+                    <!--  NEW ADD END   -->
+                    <div class="h1"></div>
+                    <div class="item">
+                        <img src="../addons/water_baby/template/img/icons/list/11.png" alt="" class="item_ico">
+                        <span id="wrap">预约列表</span>
+                        <img src="../addons/water_baby/template/img/icons/arrow.png" alt="" class="item_arrow">
+                        <span class="fr hint">
+                            <a href="{php echo $this->createMobileUrl('ViewBook');}">点击查看</a>
+                        </span>
+                    </div>
+                    <div class="h1"></div>
                 </div>
 				{elseif ($mem_info['groupid'] == 4 and $mem_info['preg_type'] == 0)}
                 <!-- 备孕 -->

@@ -124,14 +124,14 @@
                                 {loop $item $index}
                                 {if $work_data[$index]['daytype']==1 || $work_data[$index]['daytype']==3}
                                     {if $work_data[$index]['worktype']==0}
-                                        <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                        <td align="center" valign="middle" class="rest">休息</td>
                                     {elseif $work_data[$index]['worktype']==1}
-                                        <td align="center" valign="middle" class="normal">正常</td>
+                                        <td align="center" valign="middle" class="normal" onclick="book('{$work_data[$index]['worktime']}', '1')">正常</td>
                                     {elseif $work_data[$index]['worktype']==2}
                                         <td align="center" valign="middle" class="out">出诊</td>
                                     {/if}
                                 {else}
-                                    <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                    <td align="center" valign="middle" class="rest">休息</td>
                                 {/if}
                                 {/loop}
                               </tr>
@@ -140,14 +140,14 @@
                                 {loop $item $index}
                                 {if $work_data[$index]['daytype']==2 || $work_data[$index]['daytype']==3}
                                     {if $work_data[$index]['worktype']==0}
-                                        <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                        <td align="center" valign="middle" class="rest">休息</td>
                                     {elseif $work_data[$index]['worktype']==1}
-                                        <td align="center" valign="middle" class="normal">正常</td>
+                                        <td align="center" valign="middle" class="normal" onclick="book('{$work_data[$index]['worktime']}', '2')">正常</td>
                                     {elseif $work_data[$index]['worktype']==2}
                                         <td align="center" valign="middle" class="out">出诊</td>
                                     {/if}
                                 {else}
-                                    <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                    <td align="center" valign="middle" class="rest">休息</td>
                                 {/if}
                                 {/loop}
                               </tr>
@@ -167,14 +167,14 @@
                                   {loop $item2 $index}
                                   {if $work_data[$index]['daytype']==1}
                                       {if $work_data[$index]['worktype']==0 || $work_data[$index]['daytype']==3}
-                                          <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                          <td align="center" valign="middle" class="rest">休息</td>
                                       {elseif $work_data[$index]['worktype']==1}
-                                          <td align="center" valign="middle" class="normal">正常</td>
+                                          <td align="center" valign="middle" class="normal" onclick="book('{$work_data[$index]['worktime']}', '1')">正常</td>
                                       {elseif $work_data[$index]['worktype']==2}
                                           <td align="center" valign="middle" class="out">出诊</td>
                                       {/if}
                                   {else}
-                                      <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                      <td align="center" valign="middle" class="rest">休息</td>
                                   {/if}
                                   {/loop}
                                 </tr>
@@ -183,14 +183,14 @@
                                   {loop $item2 $index}
                                   {if $work_data[$index]['daytype']==2 || $work_data[$index]['daytype']==3}
                                       {if $work_data[$index]['worktype']==0}
-                                          <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                          <td align="center" valign="middle" class="rest">休息</td>
                                       {elseif $work_data[$index + 7]['worktype']==1}
-                                          <td align="center" valign="middle" class="normal">正常</td>
+                                          <td align="center" valign="middle" class="normal" onclick="book('{$work_data[$index]['worktime']}', '2')">正常</td>
                                       {elseif $work_data[$index]['worktype']==2}
                                           <td align="center" valign="middle" class="out">出诊</td>
                                       {/if}
                                   {else}
-                                      <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                      <td align="center" valign="middle" class="rest">休息</td>
                                   {/if}
                                   {/loop}
                                 </tr>
@@ -210,14 +210,14 @@
                                   {loop $item3 $index}
                                   {if $work_data[$index]['daytype']==1 || $work_data[$index]['daytype']==3}
                                       {if $work_data[$index]['worktype']==0}
-                                          <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                          <td align="center" valign="middle" class="rest">休息</td>
                                       {elseif $work_data[$index]['worktype']==1}
-                                          <td align="center" valign="middle" class="normal">正常</td>
+                                          <td align="center" valign="middle" class="normal" onclick="book('{$work_data[$index]['worktime']}', '1')">正常</td>
                                       {elseif $work_data[$index]['worktype']==2}
                                           <td align="center" valign="middle" class="out">出诊</td>
                                       {/if}
                                   {else}
-                                      <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                      <td align="center" valign="middle" class="rest">休息</td>
                                   {/if}
                                   {/loop}
                                 </tr>
@@ -226,14 +226,14 @@
                                   {loop $item3 $index}
                                   {if $work_data[$index]['daytype']==2 || $work_data[$index]['daytype']==3}
                                       {if $work_data[$index]['worktype']==0}
-                                          <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                          <td align="center" valign="middle" class="rest">休息</td>
                                       {elseif $work_data[$index]['worktype']==1}
-                                          <td align="center" valign="middle" class="normal">正常</td>
+                                          <td align="center" valign="middle" class="normal" onclick="book('{$work_data[$index]['worktime']}', '2')">正常</td>
                                       {elseif $work_data[$index]['worktype']==2}
                                           <td align="center" valign="middle" class="out">出诊</td>
                                       {/if}
                                   {else}
-                                      <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                      <td align="center" valign="middle" class="rest">休息</td>
                                   {/if}
                                   {/loop}
                                 </tr>
@@ -253,14 +253,14 @@
                                   {loop $item4 $index}
                                   {if $work_data[$index]['daytype']==1 || $work_data[$index]['daytype']==3}
                                       {if $work_data[$index]['worktype']==0}
-                                          <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                          <td align="center" valign="middle" class="rest">休息</td>
                                       {elseif $work_data[$index]['worktype']==1}
-                                          <td align="center" valign="middle" class="normal">正常</td>
+                                          <td align="center" valign="middle" class="normal" onclick="book('{$work_data[$index]['worktime']}', '1')">正常</td>
                                       {elseif $work_data[$index]['worktype']==2}
                                           <td align="center" valign="middle" class="out">出诊</td>
                                       {/if}
                                   {else}
-                                      <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                      <td align="center" valign="middle" class="rest">休息</td>
                                   {/if}
                                   {/loop}
                                 </tr>
@@ -269,14 +269,14 @@
                                   {loop $item4 $index}
                                   {if $work_data[$index]['daytype']==2 || $work_data[$index]['daytype']==3}
                                       {if $work_data[$index]['worktype']==0}
-                                          <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                          <td align="center" valign="middle" class="rest">休息</td>
                                       {elseif $work_data[$index]['worktype']==1}
-                                          <td align="center" valign="middle" class="normal">正常</td>
+                                          <td align="center" valign="middle" class="normal" onclick="book('{$work_data[$index]['worktime']}', '2')">正常</td>
                                       {elseif $work_data[$index]['worktype']==2}
                                           <td align="center" valign="middle" class="out">出诊</td>
                                       {/if}
                                   {else}
-                                      <td align="center" valign="middle" class="rest" onclick="book()">休息</td>
+                                      <td align="center" valign="middle" class="rest">休息</td>
                                   {/if}
                                   {/loop}
                                 </tr>
@@ -316,9 +316,19 @@ function initSlide()
 	  });
 }
 
-function book()
+function book(worktime, daytype)
 {
-  alert("上门随诊");
+    var href = "{php echo $this->createMobileUrl('book');}";
+    $.post(href, {'worktime' : worktime, 'daytype' : daytype}, function(data) {
+        console.log(data);
+        data = $.parseJSON(data);
+        if (data.type == 'success') {
+            location.href = data.redirect;
+        } else {
+            alert(data.message);
+        }
+    })
+    // location.href="{php echo $this->createMobileUrl('book', array())}";
 }
 
 </script>

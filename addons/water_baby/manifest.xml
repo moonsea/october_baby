@@ -3,7 +3,7 @@
 	<application setting="true">
 		<name><![CDATA[十月宝宝]]></name>
 		<identifie><![CDATA[water_baby]]></identifie>
-		<version><![CDATA[1.0.4]]></version>
+		<version><![CDATA[1.0.5]]></version>
 		<type><![CDATA[other]]></type>
 		<ability><![CDATA[十月宝宝]]></ability>
 		<description><![CDATA[十月宝宝]]></description>
@@ -35,6 +35,7 @@
 			<!-- <entry title="用户管理" do="mother" state="" direct="false" /> -->
 			<!-- <entry title="医生管理" do="doctor" state="" direct="false" /> -->
 			<entry title="Banner管理" do="banner" state="" direct="false" />
+			<entry title="医生认证" do="verify" state="" direct="false" />
 			<entry title="医院管理" do="hospital" state="" direct="false" />
 			<entry title="科室管理" do="hospdep" state="" direct="false" />
 			<entry title="职称管理" do="hosptitle" state="" direct="false" />

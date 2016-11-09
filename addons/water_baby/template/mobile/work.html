@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>排班表</title>
+    <link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+    <link href="../addons/water_baby/template/css/upload.css" rel="stylesheet" type="text/css">
+    <link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+    <link href="../addons/water_baby/template/css/swipe.css" rel="stylesheet" type="text/css">
+    <style>
+        #weui_media_hd {
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+        }
+
+        #weui_media_bd {
+            max-height: 100px;
+            overflow: hidden;
+        }
+
+        a {
+            background: #fff;
+            display: block;
+            width: 100%;
+            height: auto;
+            overflow: auto;
+        }
+        #pointer a{
+            background: #f2f2f2;
+        }
+
+        a {
+            color: #000;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+        table.paiban{
+          border:1px solid #333;
+          border-bottom: 0;
+        }
+        table.paiban td{
+          border-right:1px solid #333;
+          border-bottom:1px solid #333;
+        }
+        table.paiban tr td:nth-child(8){
+          border-right:0;
+        }
+        table.paiban tr:first-child{
+          background: #10AEFF;
+          color: #fff;
+        }
+        .normal{
+            background: #09BB07;
+            color: #fff;
+        }
+        .out{
+            background: #F43530;
+            color: #fff;
+        }
+        .rest{
+            background: #ccc;
+            color: #fff;
+        }
+        table.paiban td{
+            font-size:12px;
+        }
+    </style>
+</head>
+
+<body style="background:#fff;">
+
+    <div class="tabbar">
+        <div class="weui_tab">
+            <div class="weui_tab_bd">
+                <br>
+                <h3 style="text-align:center;">排班表(默认休息)</h3>
+                <br>
+                <div class="swipe" id="slider">
+                  	<div class='swipe-wrap' id="banner-content">
+                        <a href="javascript:void(0)">
+                            <table class="paiban" width="95%" cellspacing="0" cellspadding="0" style="margin:0 auto;">
+                              <tr>
+                                <td height="40" align="center" valign="middle">时间</td>
+                                {loop $item $index}
+                                <td height="40" align="center" valign="middle">{$week[$index]}<br>{$work_data[$index]['date']}</td>
+                                {/loop}
+                              </tr>
+                              <tr>
+                                <td height="50" align="center" valign="middle">上午</td>
+                                {loop $item $index}
+                                {if $work_data[$index]['daytype']==1 || $work_data[$index]['daytype']==3}
+                                    {if $work_data[$index]['worktype']==0}
+                                        <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="1">休息</td>
+                                    {elseif $work_data[$index]['worktype']==1}
+                                        <td align="center" valign="middle" class="normal" data-date="{$work_data[$index]['worktime']}" data-type="1">正常</td>
+                                    {elseif $work_data[$index]['worktype']==2}
+                                        <td align="center" valign="middle" class="out" data-date="{$work_data[$index]['worktime']}" data-type="1">出诊</td>
+                                    {/if}
+                                {else}
+                                    <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="1">休息</td>
+                                {/if}
+                                {/loop}
+                              </tr>
+                              <tr>
+                                <td height="50" align="center" valign="middle">下午</td>
+                                {loop $item $index}
+                                {if $work_data[$index]['daytype']==2 || $work_data[$index]['daytype']==3}
+                                    {if $work_data[$index]['worktype']==0}
+                                        <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="2">休息</td>
+                                    {elseif $work_data[$index]['worktype']==1}
+                                        <td align="center" valign="middle" class="normal" data-date="{$work_data[$index]['worktime']}" data-type="2">正常</td>
+                                    {elseif $work_data[$index]['worktype']==2}
+                                        <td align="center" valign="middle" class="out" data-date="{$work_data[$index]['worktime']}" data-type="2">出诊</td>
+                                    {/if}
+                                {else}
+                                    <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="2">休息</td>
+                                {/if}
+                                {/loop}
+                              </tr>
+                            </table>
+                        </a>
+                        <a href="javascript:void(0)">
+                            <table class="paiban" width="95%" cellspacing="0" cellspadding="0" style="margin:0 auto;">
+                                <tr>
+                                  <td height="40" align="center" valign="middle">时间</td>
+                                  {loop $item2 $index}
+                                  <td height="40" align="center" valign="middle">{$week[$index]}<br>{$work_data[$index]['date']}</td>
+                                  {/loop}
+                                </tr>
+
+                                <tr>
+                                  <td height="50" align="center" valign="middle">上午</td>
+                                  {loop $item2 $index}
+                                  {if $work_data[$index]['daytype']==1}
+                                      {if $work_data[$index]['worktype']==0 || $work_data[$index]['daytype']==3}
+                                          <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="1">休息</td>
+                                      {elseif $work_data[$index]['worktype']==1}
+                                          <td align="center" valign="middle" class="normal" data-date="{$work_data[$index]['worktime']}" data-type="1">正常</td>
+                                      {elseif $work_data[$index]['worktype']==2}
+                                          <td align="center" valign="middle" class="out" data-date="{$work_data[$index]['worktime']}" data-type="1">出诊</td>
+                                      {/if}
+                                  {else}
+                                      <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="1">休息</td>
+                                  {/if}
+                                  {/loop}
+                                </tr>
+                                <tr>
+                                  <td height="50" align="center" valign="middle">下午</td>
+                                  {loop $item2 $index}
+                                  {if $work_data[$index]['daytype']==2 || $work_data[$index]['daytype']==3}
+                                      {if $work_data[$index]['worktype']==0}
+                                          <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="2">休息</td>
+                                      {elseif $work_data[$index + 7]['worktype']==1}
+                                          <td align="center" valign="middle" class="normal" data-date="{$work_data[$index]['worktime']}" data-type="2">正常</td>
+                                      {elseif $work_data[$index]['worktype']==2}
+                                          <td align="center" valign="middle" class="out" data-date="{$work_data[$index]['worktime']}" data-type="2">出诊</td>
+                                      {/if}
+                                  {else}
+                                      <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="2">休息</td>
+                                  {/if}
+                                  {/loop}
+                                </tr>
+                            </table>
+                        </a>
+                        <a href="javascript:void(0)">
+                            <table class="paiban" width="95%" cellspacing="0" cellspadding="0" style="margin:0 auto;">
+                                <tr>
+                                  <td height="40" align="center" valign="middle">时间</td>
+                                  {loop $item3 $index}
+                                  <td height="40" align="center" valign="middle">{$week[$index]}<br>{$work_data[$index]['date']}</td>
+                                  {/loop}
+                                </tr>
+
+                                <tr>
+                                  <td height="50" align="center" valign="middle">上午</td>
+                                  {loop $item3 $index}
+                                  {if $work_data[$index]['daytype']==1 || $work_data[$index]['daytype']==3}
+                                      {if $work_data[$index]['worktype']==0}
+                                          <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="1">休息</td>
+                                      {elseif $work_data[$index]['worktype']==1}
+                                          <td align="center" valign="middle" class="normal" data-date="{$work_data[$index]['worktime']}" data-type="1">正常</td>
+                                      {elseif $work_data[$index]['worktype']==2}
+                                          <td align="center" valign="middle" class="out" data-date="{$work_data[$index]['worktime']}" data-type="1">出诊</td>
+                                      {/if}
+                                  {else}
+                                      <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="1">休息</td>
+                                  {/if}
+                                  {/loop}
+                                </tr>
+                                <tr>
+                                  <td height="50" align="center" valign="middle">下午</td>
+                                  {loop $item3 $index}
+                                  {if $work_data[$index]['daytype']==2 || $work_data[$index]['daytype']==3}
+                                      {if $work_data[$index]['worktype']==0}
+                                          <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="2">休息</td>
+                                      {elseif $work_data[$index]['worktype']==1}
+                                          <td align="center" valign="middle" class="normal" data-date="{$work_data[$index]['worktime']}" data-type="2">正常</td>
+                                      {elseif $work_data[$index]['worktype']==2}
+                                          <td align="center" valign="middle" class="out" data-date="{$work_data[$index]['worktime']}" data-type="2">出诊</td>
+                                      {/if}
+                                  {else}
+                                      <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="2">休息</td>
+                                  {/if}
+                                  {/loop}
+                                </tr>
+                            </table>
+                        </a>
+                        <a href="javascript:void(0)">
+                            <table class="paiban" width="95%" cellspacing="0" cellspadding="0" style="margin:0 auto;">
+                                <tr>
+                                  <td height="40" align="center" valign="middle">时间</td>
+                                  {loop $item4 $index}
+                                  <td height="40" align="center" valign="middle">{$week[$index]}<br>{$work_data[$index]['date']}</td>
+                                  {/loop}
+                                </tr>
+
+                                <tr>
+                                  <td height="50" align="center" valign="middle">上午</td>
+                                  {loop $item4 $index}
+                                  {if $work_data[$index]['daytype']==1 || $work_data[$index]['daytype']==3}
+                                      {if $work_data[$index]['worktype']==0}
+                                          <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="1">休息</td>
+                                      {elseif $work_data[$index]['worktype']==1}
+                                          <td align="center" valign="middle" class="normal" data-date="{$work_data[$index]['worktime']}" data-type="1">正常</td>
+                                      {elseif $work_data[$index]['worktype']==2}
+                                          <td align="center" valign="middle" class="out" data-date="{$work_data[$index]['worktime']}" data-type="1">出诊</td>
+                                      {/if}
+                                  {else}
+                                      <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="1">休息</td>
+                                  {/if}
+                                  {/loop}
+                                </tr>
+                                <tr>
+                                  <td height="50" align="center" valign="middle">下午</td>
+                                  {loop $item4 $index}
+                                  {if $work_data[$index]['daytype']==2 || $work_data[$index]['daytype']==3}
+                                      {if $work_data[$index]['worktype']==0}
+                                          <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="2">休息</td>
+                                      {elseif $work_data[$index]['worktype']==1}
+                                          <td align="center" valign="middle" class="normal" data-date="{$work_data[$index]['worktime']}" data-type="2">正常</td>
+                                      {elseif $work_data[$index]['worktype']==2}
+                                          <td align="center" valign="middle" class="out" data-date="{$work_data[$index]['worktime']}" data-type="2">出诊</td>
+                                      {/if}
+                                  {else}
+                                      <td align="center" valign="middle" class="rest" data-date="{$work_data[$index]['worktime']}" data-type="2">休息</td>
+                                  {/if}
+                                  {/loop}
+                                </tr>
+                            </table>
+                        </a>
+                      </div>
+                      <div id="pointer" style="bottom:0px;">
+                          <a class="active"></a>
+                          <a></a>
+                          <a></a>
+                          <a></a>
+                      </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="actionsheet" style="display:none; position:absolute; left:0; right:0; bottom:0; z-index:2;">
+        <div style="width:100%; height:48px; font-size:18px; line-height:48px; text-align:center; background:#fff;border-bottom:1px solid #f2f2f2;" onclick="rest()">
+            休息
+        </div>
+        <div style="width:100%; height:48px; font-size:18px; line-height:48px; text-align:center; background:#fff;border-bottom:1px solid #f2f2f2;" onclick="out()">
+            出诊
+        </div>
+        <div style="width:100%; height:48px; font-size:18px; line-height:48px; text-align:center; background:#fff;border-bottom:1px solid #f2f2f2;" onclick="normal()">
+            正常
+        </div>
+        <div style="height:5px; background:#f2f2f2;"></div>
+        <div style="width:100%; height:48px; font-size:18px; line-height:48px; text-align:center; background:#fff;border-bottom:1px solid #f2f2f2;" onclick="cancel()">
+            取消
+        </div>
+    </div>
+    <div id="cover" style="position:absolute; font-size:18px; left:0; right:0; top:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1; display:none;" onclick="cancel()"></div>
+
+
+    <script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
+    <script src="../addons/water_baby/template/js/swipe.js" type="text/javascript"></script>
+<script type="text/javascript">
+type = "";
+date = "";
+data_type = "";
+dom = "";
+$().ready(function(e) {
+    initSlide();
+    $(".rest").each(function(){
+        $(this).attr("tapmode","");
+        $(this).click(function(event) {
+            change($(this));
+        });
+    });
+    $(".normal").each(function(){
+        $(this).attr("tapmode","");
+        $(this).click(function(event) {
+            change($(this));
+        });
+    });
+    $(".out").each(function(){
+        $(this).attr("tapmode","");
+        $(this).click(function(event) {
+            change($(this));
+        });
+    });
+});
+
+function change(e)
+{
+  type = e.attr("class");
+  date = e.attr("data-date");
+  data_type = e.attr("data-type");
+  dom = e;
+  $("#cover").fadeIn(200);
+  $("#actionsheet").fadeIn(200);
+}
+
+function rest()
+{
+    // alert(0);
+    doBook(0);
+}
+
+function out()
+{
+    doBook(2);
+}
+
+function normal()
+{
+    doBook(1);
+}
+
+function doBook(worktype) {
+    var href = "{php echo $this->createMobileUrl('UpdateWorkDay');}";
+    $.post(href, {'worktime' : date, 'daytype' : data_type, 'worktype' : worktype}, function(data) {
+        console.log(data);
+        data = $.parseJSON(data);
+        if (data.type == 'success') {
+            //location.href = data.redirect;
+            dom.removeClass(dom.attr("class"));
+            if(worktype == 0)
+            {
+                dom.addClass('rest');
+                dom.html("休息");
+            }
+            if(worktype == 1)
+            {
+                dom.addClass('normal');
+                dom.html("正常");
+            }
+            if(worktype == 2)
+            {
+                dom.addClass('out');
+                dom.html("出诊");
+            }
+            cancel();
+        } else {
+            alert(data.message);
+        }
+    })
+}
+
+function cancel()
+{
+    type = "";
+    date = "";
+    data_type = "";
+    $("#cover").fadeOut(200);
+    $("#actionsheet").fadeOut(200);
+}
+
+function hideActionSheet()
+{
+    var $iosActionsheet = $('#iosActionsheet');
+    var $iosMask = $('#iosMask');
+    $iosActionsheet.removeClass('weui-actionsheet_toggle');
+    $iosMask.fadeOut(200);
+}
+
+function initSlide()
+{
+	Swipe(document.getElementById('slider'), {
+		continuous: true,
+		callback: function(pos){
+			$("#pointer a").each(function(index, element) {
+				$(this).removeClass("active");
+			});
+			$("#pointer a:nth-child("+(pos+1)+")").addClass("active")
+		}
+	  });
+}
+
+function book()
+{
+    location.href="{php echo $this->createMobileUrl('book')}";
+}
+
+</script>
+
+</body>
+
+</html>

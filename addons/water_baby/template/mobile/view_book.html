@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>预约列表</title>
+<link href="../addons/water_baby/template/css/weui.min.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/example.css" rel="stylesheet" type="text/css">
+<link href="../addons/water_baby/template/css/index.css" rel="stylesheet" type="text/css">
+<style>
+#weui_media_bd{-webkit-box-flex: 2;-webkit-flex: 2;-ms-flex: 2;flex: 2;}
+#fr{position:absolute; top:15px; right:15px;}
+#charge{position:absolute; bottom:15px; right:15px;}
+</style>
+</head>
+
+<body>
+	<div class="tabbar">
+        <div class="weui_tab">
+            <div class="weui_tab_bd">
+                {loop $user_list $item}
+                <a href="javascript:void(0);" class="weui_media_box weui_media_appmsg" style="border-bottom:1px solid #ccc; padding:5px;" onclick="func({$item['id']}, {$item['status']})">
+                    <div class="weui_media_hd" id="weui_media_hd">
+                        <img class="weui_media_appmsg_thumb"
+                            src="{if substr($item['user_info']['avatar'],0,4) != 'http'}../attachment/{/if}{$item['user_info']['avatar']}" alt=""
+                            style="max-width:85%;"
+                            >
+                    </div>
+                    <div class="weui_media_bd" id="weui_media_bd">
+                        <h4 class="weui_media_title">{$item['user_info']['nickname']}</h4>
+                        <p class="weui_media_desc">
+                            {$item['user_info']['bio']}
+                        </p>
+                    </div>
+                    <div class="weui_media_bd" id="weui_media_bd">
+                        <h4 class="weui_media_title">{if $item['status'] == '1'}预约{elseif $item['status'] == '2'}拒绝{elseif $item['status'] == '3'}同意{/if}</h4>
+                    </div>
+                    <div class="weui_media_bd" style="font-size:14px;">
+                        {php echo substr(date('Y-m-d H:i:s', $item['worktime']),2);}
+                    </div>
+                </a>
+				{/loop}
+            </div>
+            <div class="weui_tabbar">
+                <a href="{php echo $this->createMobileUrl('index');}" class="weui_tabbar_item">
+                    <div class="weui_tabbar_icon">
+                        <img src="../addons/water_baby/template/img/icons/index.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">首页</p>
+                </a>
+                <a href="{php echo $this->createMobileUrl('consult');}" class="weui_tabbar_item">
+                    <div class="weui_tabbar_icon">
+                        <img src="../addons/water_baby/template/img/icons/consultlation.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">咨询</p>
+                </a>
+                <a href="{php echo $this->createMobileUrl('my');}" class="weui_tabbar_item  weui_bar_item_on">
+                    <div class="weui_tabbar_icon">
+                        <img src="../addons/water_baby/template/img/icons/my_active.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">我的</p>
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="actionsheet" style="display:none; position:absolute; left:0; right:0; bottom:0; z-index:2;">
+        <div style="width:100%; height:48px; font-size:18px; line-height:48px; text-align:center; background:#fff;border-bottom:1px solid #f2f2f2;" onclick="agree()">
+            同意
+        </div>
+        <div style="width:100%; height:48px; font-size:18px; line-height:48px; text-align:center; background:#fff;border-bottom:1px solid #f2f2f2;" onclick="disagree()">
+            拒绝
+        </div>
+        <div style="height:5px; background:#f2f2f2;"></div>
+        <div style="width:100%; height:48px; font-size:18px; line-height:48px; text-align:center; background:#fff;border-bottom:1px solid #f2f2f2;" onclick="cancel()">
+            取消
+        </div>
+    </div>
+    <div id="cover" style="position:absolute; font-size:18px; left:0; right:0; top:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1; display:none;" onclick="cancel()"></div>
+
+
+</body>
+
+<script src="../addons/water_baby/template/js/jquery.min.js" type="text/javascript"></script>
+<script>
+var book_id = '';
+var old_status = '';
+
+function func(id, status)
+{
+    $("#cover").fadeIn(200);
+    $("#actionsheet").fadeIn(200);
+    book_id = id;
+    old_status = status;
+}
+
+function cancel()
+{
+    type = "";
+    date = "";
+    data_type = "";
+    $("#cover").fadeOut(200);
+    $("#actionsheet").fadeOut(200);
+}
+
+function agree()
+{
+    if (old_status != '3') {
+        Resp(book_id, '3');
+    }
+
+    cancel();
+}
+
+function disagree()
+{
+    if (old_status != '2') {
+        Resp(book_id, '2');
+    }
+    cancel();
+}
+
+function Resp(book_id, status, old_status) {
+    var href = "{php echo $this->createMobileUrl('RespBook');}";
+    $.post(href, {'book_id' : book_id, 'status' : status}, function(data) {
+        console.log(data);
+        data = $.parseJSON(data);
+        if (data.type == 'success') {
+            cancel();
+        } else {
+            alert(data.message);
+        }
+    })
+}
+
+</script>
+
+
+
+
+</html>

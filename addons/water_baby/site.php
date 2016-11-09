@@ -610,6 +610,190 @@ class water_babyModuleSite extends WeModuleSite
     }
 
     /**
+     * 孕妇预约
+     * @return [type] [description]
+     */
+    public function doMobileBook()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $worktime = $_GPC['worktime'];
+        $daytype = $_GPC['daytype'];
+
+        $url = $this->createMobileUrl('BookPage', array('worktime' => $worktime, 'daytype' => $daytype));
+
+        message('预约', $url, 'success');
+        // include $this->template('book');
+    }
+
+    /**
+     * 预约页面
+     * @return [type] [description]
+     */
+    public function doMobileBookPage()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $worktime = $_GPC['worktime'];
+        $daytype = $_GPC['daytype'];
+
+        include $this->template('book');
+    }
+
+    /**
+     * 预约医生
+     *
+     */
+    public function doMobileDoBook()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $worktime = $_GPC['worktime'];
+        $daytype = $_GPC['daytype'];
+
+        $user_id = $_W['member']['uid'];
+        $conv = pdo_get('mc_doctor_user', array('user_id' => $user_id));
+        $doctor_id = $conv['doctor_id'];
+        $url = $this->createMobileUrl('doctor3view', array('doctor_id' => $doctor_id));
+
+        $work_data = pdo_get('water_baby_work_day', array('user_id' => $doctor_id, 'worktime' => $worktime));
+        if (empty($work_data)) {
+            message('医生当前时间不可预约', $url, 'error');
+        }
+
+        if ($work_data['daytype'] == $daytype || $work_data['daytype'] == 3) {
+
+            $row = pdo_get('water_baby_book', array('user_id' => $user_id, 'doctor_id' => $doctor_id, 'worktime' => $worktime, 'daytype' => $daytype));
+            if (!empty($row)) {
+                message('您已预约该时间！', $url, 'errork');
+            }
+
+            $book_data = array('user_id' => $user_id, 'doctor_id' => $doctor_id, 'worktime' => $worktime, 'daytype' => $daytype, 'addtime' => time(), 'status' => '1');
+            pdo_insert('water_baby_book', $book_data);
+
+            message('预约成功', $url, 'success');
+        }
+        else {
+            message('医生当前时间不可预约', $url, 'error');
+        }
+    }
+
+    /**
+     * 医生认证
+     * @return [type] [description]
+     */
+    public function doMobileVerify()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $access_token = $this->getToken();
+        if($_COOKIE['jsapi_ticket'])
+            {
+                $jsapi_ticket = $_COOKIE['jsapi_ticket'];
+            }
+            else
+            {
+                $tmp = json_decode(file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi"));
+                $jsapi_ticket = $tmp->ticket;
+                setcookie('jsapi_ticket',$jsapi_ticket,7000);
+                $_COOKIE['jsapi_ticket'] == $jsapi_ticket;
+            }
+        $noncestr = 'Wm3WZYTPz0wzccnW';
+        $timestamp = time();
+        // $url = 'http://shiyue.october-baby.com/baby/app/index.php?i=4&c=entry&do=index&m=water_baby';
+        $url = 'http://shiyue.october-baby.com/baby/app/index.php?'.$_SERVER['QUERY_STRING'];
+        $string = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$url";
+        $signature = sha1($string);
+
+        include $this->template('doctor_verify');
+    }
+
+    /**
+     * 上传认证信息
+     * @return [type] [description]
+     */
+    public function doMobileDoVerify()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+        $user_id = $_W['member']['uid'];
+        $username = $_GPC['username'];
+        $age = $_GPC['age'];
+        $card_num = $_GPC['card_num'];
+        if (empty($card_num)) {
+            message('身份证号不能为空', '', 'error');
+        }
+        $media_id = $_GPC['media_id'];
+        if (empty($media_id)) {
+            message('资质照片不能为空', '', 'error');
+        }
+
+        $url = $this->createMobileUrl('my');
+        $res = $this->saveImage($media_id, 'verify');
+        if (is_null($res)) {
+            message('提交失败', '', 'error');
+        }
+
+        $row = pdo_get('water_baby_doc_verify', array('user_id' => $user_id));
+        if (empty($row)) {
+            $verify_data = array('user_id' => $user_id, 'username' => $username,'age' => $age, 'card_num' => $card_num, 'pic_url' => $res, 'addtime' => time(), 'status' => '1');
+            pdo_insert('water_baby_doc_verify', $verify_data);
+        }
+        elseif (empty($row['verifytime'])) {
+            message('正在认证', '', 'error');
+        }
+        elseif ($row['status'] == '3') {
+            $verify_data = array('username' => $username,'age' => $age, 'card_num' => $card_num, 'pic_url' => $res, 'addtime' => time(), 'status' => '1', 'verifytime' => '');
+            pdo_update('water_baby_doc_verify', $verify_data, array('id' => $row['id']));
+            message('提交成功', $url, 'success');
+        }
+        else {
+            message('提交失败', '', 'error');
+        }
+    }
+
+    /**
+     * 医生排班表
+     * @return [type] [description]
+     */
+    public function doMobileWork()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $doctor_id = $_W['member']['uid'];
+
+        $last_monday = strtotime("-2 monday");
+        $next_sunday = strtotime("+3 monday") - 1;
+
+        /* 获取医生值班列表 */
+        $sql = "SELECT * FROM ".tablename('water_baby_work_day')." WHERE user_id = '$doctor_id'";
+        $sql .= " and worktime between '".$last_monday."' and '".$next_sunday."'";
+        $work_list = pdo_fetchall($sql);
+
+        $work_data = $this->getWorkData($work_list, $last_monday, $next_sunday);
+
+        $item = [0,1,2,3,4,5,6];
+        $item2 = [7,8,9,10,11,12,13];
+        $item3 = [14,15,16,17,18,19,20];
+        $item4 = [21,22,23,24,25,26,27];
+        $week = ['星期一','星期二','星期三','星期四','星期五','星期六','星期天','星期一','星期二','星期三','星期四','星期五','星期六','星期天','星期一','星期二','星期三','星期四','星期五','星期六','星期天','星期一','星期二','星期三','星期四','星期五','星期六','星期天'];
+
+        include $this->template('work');
+    }
+
+
+    /**
      * 医生/律师查看与孕妇会话列表.
      *
      * @param string $type [description]
@@ -775,6 +959,7 @@ class water_babyModuleSite extends WeModuleSite
         $mem_info['hosp_name'] = pdo_get('mc_hospital', array('hosp_id' => $mem_info['hosp_id']))['hosp_name'];
         $mem_info['dep_name'] = pdo_get('mc_hosp_dep', array('dep_id' => $mem_info['dep_id']))['dep_name'];
         $mem_info['title_name'] = pdo_get('mc_hosp_title', array('title_id' => $mem_info['title_id']))['title_name'];
+        $mem_info['ver_sta'] = pdo_get('water_baby_doc_verify', array('user_id' => $uid))['status'];
 
         /* 孕妇相关信息 */
         $mem_info['baby_birthday'] = $mem_info['baby_birthday'] == null ? date('Y/m/d', 0) : date('Y/m/d', $mem_info['baby_birthday']);
@@ -1694,33 +1879,6 @@ class water_babyModuleSite extends WeModuleSite
 
         $mem_doctor = $this->getMemInfo($doctor_id);
 
-        /* 当期周几 */
-        // $cur_time = time();
-        // $cur_week = date('w', $cur_time);
-        // switch($cur_week){
-        //     case 1:
-        //         return "星期一";
-        //         break;
-        //     case 2:
-        //         return "星期二";
-        //         break;
-        //     case 3:
-        //         return "星期三";
-        //         break;
-        //     case 4:
-        //         return "星期四";
-        //         break;
-        //     case 5:
-        //         return "星期五";
-        //         break;
-        //     case 6:
-        //         return "星期六";
-        //         break;
-        //     case 0:
-        //         return "星期日";
-        //         break;
-        // }
-
         $last_monday = strtotime("-2 monday");
         $next_sunday = strtotime("+3 monday") - 1;
 
@@ -1756,10 +1914,12 @@ class water_babyModuleSite extends WeModuleSite
             $time = $last_monday + $i * 86400 - 1;
             $day = date('m-d', $time);
             $temp_data['date'] = $day;
+            $temp_data['worktime'] = $time;
             $temp_data['worktype'] = '0';
             $temp_data['daytype'] = '1';
             foreach ($work_list as $item) {
                 if (date('m-d', $item['worktime']) == $day) {
+                    $temp_data['worktime'] = $item['worktime'];
                     $temp_data['worktype'] = $item['worktype'];
                     $temp_data['daytype'] = $item['daytype'];
                 }
@@ -1780,14 +1940,13 @@ class water_babyModuleSite extends WeModuleSite
 
         checkauth();
 
-        $date = $_GPC['date'];
-        if (empty($date)) {
+        $worktime = $_GPC['worktime'];
+        if (empty($worktime)) {
             message('日期不能为空','','error');
             exit();
         }
-        $worktime = strtotime($date);
         $daytype = empty($_GPC['daytype'])? '1':$_GPC['daytype'];
-        $worktype = empty($_GPC['type'])? '0':$_GPC['worktype'];
+        $worktype = empty($_GPC['worktype'])? '0':$_GPC['worktype'];
 
         $user_id = $_W['member']['uid'];
 
@@ -1877,6 +2036,58 @@ class water_babyModuleSite extends WeModuleSite
         }
         message('更新失败',referer(),'error');
     }
+
+    /**
+     * 医生查看预约
+     * @return [type] [description]
+     */
+    public function doMobileViewBook()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $doctor_id = $_W['member']['uid'];
+
+        $sql = "SELECT * FROM ".tablename('water_baby_book')." WHERE doctor_id = '$doctor_id' ORDER BY status, addtime";
+        $user_list = pdo_fetchall($sql);
+
+        for ($i=0; $i < count($user_list); $i++) {
+            $user_list[$i]['user_info'] = $this->getMemInfo($user_list[$i]['user_id']);
+        }
+
+        include $this->template('view_book');
+    }
+
+    /**
+     * 医生响应预约
+     * @return [type] [description]
+     */
+    public function doMobileRespBook()
+    {
+        global $_W,$_GPC;
+
+        checkauth();
+
+        $book_id = $_GPC['book_id'];
+        if (empty($book_id)) {
+            message('操作失败',referer(),'error');
+        }
+
+        $status = empty($_GPC['status'])?'2':$_GPC['status'];
+
+        $old_status = pdo_get('water_baby_book', array('id' => $book_id))['status'];
+        if ($status == $old_status) {
+            message('操作成功', referer(), 'success');
+        }
+
+        $res = pdo_update('water_baby_book', array('status' => $status), array('id' => $book_id));
+        if (!empty($res)) {
+            message('操作成功', referer(), 'success');
+        }
+        message('操作失败',referer(),'error');
+    }
+
 
 
     /************* Web *******************************/
@@ -2340,6 +2551,105 @@ class water_babyModuleSite extends WeModuleSite
         }
         include $this->template('addbanner');
     }
+
+    /**
+     * 医生认证管理
+     * @return [type] [description]
+     */
+    public function dowebVerify()
+    {
+        global $_W,$_GPC;
+
+        $pageNumber = max(1, intval($_GPC['page']));
+        $pageSize = 20;
+
+        $type = empty($_GPC['type'])? '1':$_GPC['type'];
+
+        $table = 'water_baby_doc_verify';
+        $sql = 'SELECT * FROM '.tablename($table)." WHERE status = '{$type}' ORDER BY addtime LIMIT ".($pageNumber - 1) * $pageSize.','.$pageSize;
+        $list = pdo_fetchall($sql);
+
+        $total = pdo_fetchcolumn('SELECT COUNT(*) FROM '.tablename($table));
+        $pager = pagination($total, $pageNumber, $pageSize);
+
+        include $this->template('verify');
+    }
+
+    /**
+     * 认证医生
+     * @return [type] [description]
+     */
+    public function dowebDoVerify()
+    {
+        global $_W,$_GPC;
+
+        load()->func('tpl');
+        $table = 'water_baby_doc_verify';
+
+        $ver_id = intval($_GPC['ver_id']);
+        if ($ver_id > 0) {
+            $ver = pdo_fetch('SELECT * FROM '.tablename($table)." WHERE id= '{$ver_id}'");
+            if (!$ver) {
+                message('抱歉，信息不存在或是已经删除！', '', 'error');
+            }
+            //$topicurl = $_W['siteroot'].'app/'.$this->createMobileUrl ( 'topic',array('topicid'=>$topicid));
+        }
+
+        if ($_GPC['op'] == 'delete') {
+            pdo_delete($table, array('id' => $ver_id));
+            message('删除成功！', referer(), 'success');
+        }
+        elseif ($_GPC['op'] == 'pass') {
+            $data = array(
+                    'status' => '2',
+                    'verifytime' => time(),
+            );
+            pdo_update($table, $data, array('id' => $ver_id));
+        }
+        else {
+            $data = array(
+                    'status' => '3',
+                    'verifytime' => time(),
+            );
+            pdo_update($table, $data, array('id' => $ver_id));
+        }
+
+        message('更新成功！', referer(), 'success');
+
+        // if (checksubmit()) {
+        //     $data = array(
+        //             'status' => $_GPC ['status'],
+        //             'verifytime' => time(),
+        //     );
+        //
+        //     if (!empty($ver_id)) {
+        //         pdo_update($table, $data, array('id' => $ver_id));
+        //     } else {
+        //         // message('更新成功！', referer(), 'success');
+        //         // $data['uniacid'] = $_W['uniacid'];
+        //         // pdo_insert($table, $data);
+        //         // $img_id = pdo_insertid();
+        //     }
+        //     $ver = pdo_fetch('SELECT * FROM '.tablename($table)." WHERE id = '{$ver_id}'");
+        //     message('更新成功！', referer(), 'success');
+        // }
+        //
+        // include $this->template('doverify');
+    }
+
+    /**
+     *
+     *   =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+     * /\                                                                 /\
+     * /\ FFFFF U     U NN    N  CCCCC TTTTTTTT IIIIIIII   OOOO   NN    N /\
+     * /\ F     U     U N N   N C         TT       II    O      O N N   N /\
+     * /\ FFFFF U     U N  N  N C         TT       II    O      O N  N  N /\
+     * /\ F     U     U N   N N C         TT       II    O      O N   N N /\
+     * /\ F      UUUUU  N    NN  CCCCC    TT    IIIIIIII   OOOO   N    NN /\
+     * /\                                                                 /\
+     *   =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+     *
+     */
 
 
     /**
